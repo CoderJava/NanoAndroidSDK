@@ -32,13 +32,22 @@ public class NRConnection {
                         listener.response(retMap, null);
                     }
                 }
+                if (getConnections().contains(downloader)) {
+                    getConnections().remove(downloader);
+                }
             }
         });
         downloader.execute(url);
     }
 
     public static void cancelAllConnections() {
-
+        ArrayList<NRDownloader> downloaders = new ArrayList<NRDownloader>(getConnections());
+        for (NRDownloader downloader: downloaders) {
+            downloader.cancel(true);
+            getConnections().remove(downloader);
+            downloader = null;
+        }
+        mConnections = null;
     }
 
     static private ArrayList<NRDownloader> getConnections() {

@@ -10,10 +10,10 @@ import java.net.URLConnection;
 /**
  * Created by nissopa on 9/12/15.
  */
-public class NRDownloader extends  AsyncTask <String, Integer, byte[]> {
+public class NRDownloader extends  AsyncTask <String, Integer, Object> {
     private NRDownloaderListener mListener;
     public interface NRDownloaderListener {
-        public void downloadCompleted(NRDownloader downloader, byte[] data, NRError error);
+        public void downloadCompleted(NRDownloader downloader, Object data, NRError error);
     }
 
     public NRDownloader(NRDownloaderListener listener) {
@@ -22,7 +22,7 @@ public class NRDownloader extends  AsyncTask <String, Integer, byte[]> {
     }
 
     @Override
-    protected byte[] doInBackground(String... urls) {
+    protected Object doInBackground(String... urls) {
         String linkToFile = urls[0];
         return getFileAtUrl(linkToFile);
     }
@@ -33,11 +33,17 @@ public class NRDownloader extends  AsyncTask <String, Integer, byte[]> {
     }
 
     @Override
-    protected void onPostExecute(byte[] bytes){
-        mListener.downloadCompleted(this, bytes, null);
+    protected void onPostExecute(Object bytes){
+        if (bytes instanceof NRError) {
+            mListener.downloadCompleted(this, null, (NRError)bytes);
+        } else if (((byte[])bytes).length > 0) {
+            mListener.downloadCompleted(this, bytes, null);
+        } else {
+            mListener.downloadCompleted(this, null, NRError.error("Parsed Response", 1001, "Empty response"));
+        }
     }
 
-    private byte[] getFileAtUrl(String url){
+    private Object getFileAtUrl(String url){
         byte[] data = null;
         try{
             URL link = new URL(url);
@@ -54,6 +60,7 @@ public class NRDownloader extends  AsyncTask <String, Integer, byte[]> {
             data = bos.toByteArray();
         }catch (Exception e){
             e.printStackTrace();
+            return NRError.error("Connection", 1000, e.getMessage());
         }
         return data;
     }
