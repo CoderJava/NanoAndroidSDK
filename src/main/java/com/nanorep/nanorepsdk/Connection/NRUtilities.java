@@ -25,4 +25,13 @@ public class NRUtilities {
         }
         return link;
     }
+
+    public static String wrappedContext(HashMap<String, String > context) {
+        String _context = "";
+        for (String key: context.keySet()) {
+            _context += key + ":" + context.get(key) + ",";
+        }
+        _context = _context.substring(0, _context.length() - 1);
+        return _context;
+    }
 }
