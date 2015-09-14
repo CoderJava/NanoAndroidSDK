@@ -4,13 +4,14 @@ import android.os.AsyncTask;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
 /**
  * Created by nissopa on 9/12/15.
  */
-public class NRDownloader extends  AsyncTask <String, Integer, Object> {
+public class NRDownloader extends  AsyncTask <URL, Integer, Object> {
     private NRDownloaderListener mListener;
     public interface NRDownloaderListener {
         public void downloadCompleted(NRDownloader downloader, Object data, NRError error);
@@ -22,9 +23,9 @@ public class NRDownloader extends  AsyncTask <String, Integer, Object> {
     }
 
     @Override
-    protected Object doInBackground(String... urls) {
-        String linkToFile = urls[0];
-        return getFileAtUrl(linkToFile);
+    protected Object doInBackground(URL... urls) {
+        URL url = urls[0];
+        return getFileAtUrl(url);
     }
 
     @Override
@@ -43,13 +44,10 @@ public class NRDownloader extends  AsyncTask <String, Integer, Object> {
         }
     }
 
-    private Object getFileAtUrl(String url){
+    private Object getFileAtUrl(URL url){
         byte[] data = null;
         try{
-            URL link = new URL(url);
-            URLConnection connection = link.openConnection();
-            connection.connect();
-            InputStream inputStream = new BufferedInputStream(link.openStream());
+            InputStream inputStream = new BufferedInputStream(url.openStream());
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             int next = inputStream.read();
             while (next > -1){

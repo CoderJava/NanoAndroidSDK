@@ -1,12 +1,9 @@
 package com.nanorep.nanorepsdk.Connection;
 
 
-import android.util.Log;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
-import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -14,12 +11,14 @@ import java.util.HashMap;
  * Created by nissopa on 9/12/15.
  */
 public class NRConnection {
+    public static String NRStatusKey = "status";
+
     static private ArrayList<NRDownloader> mConnections;
     public interface NRConnectionListener {
         public void response(HashMap responseParam, NRError error);
     }
 
-    public static void connectionWithRequest(String url, final NRConnectionListener listener) {
+    public static void connectionWithRequest(URL url, final NRConnectionListener listener) {
         NRDownloader downloader = new NRDownloader(new NRDownloader.NRDownloaderListener() {
             @Override
             public void downloadCompleted(NRDownloader downloader, Object data, NRError error) {
@@ -28,12 +27,12 @@ public class NRConnection {
                         listener.response(null, error);
                     } else if (data != null) {
                         String jsonString = new String((byte[])data);
-                        HashMap<String, Object> retMap = new Gson().fromJson(jsonString, new TypeToken<HashMap<String, Object>>() {}.getType());
+                        HashMap<String, Object> retMap = (HashMap)NRUtilities.jsonStringToMap(jsonString);
                         listener.response(retMap, null);
                     }
                 }
-                if (getConnections().contains(downloader)) {
-                    getConnections().remove(downloader);
+                if (NRConnection.mConnections != null && NRConnection.mConnections.contains(downloader)) {
+                    NRConnection.mConnections.remove(downloader);
                 }
             }
         });

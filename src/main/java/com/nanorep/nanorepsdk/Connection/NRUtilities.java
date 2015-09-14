@@ -1,9 +1,25 @@
 package com.nanorep.nanorepsdk.Connection;
 
+import android.content.Context;
+import android.content.res.Resources;
+
+import com.nanorep.nanorepsdk.BuildConfig;
+import com.nanorep.nanorepsdk.R;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -33,5 +49,77 @@ public class NRUtilities {
         }
         _context = _context.substring(0, _context.length() - 1);
         return _context;
+    }
+
+    public static Map<String, Object> jsonStringToMap(String jsonString){
+        HashMap map = null;
+        try {
+            JSONObject jsonObject = new JSONObject(jsonString);
+            map = (HashMap) mapFromJson(jsonObject);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return map;
+    }
+    public static Map<String, Object> toMap(JSONObject object) throws JSONException {
+        Map<String, Object> map = new HashMap();
+        Iterator keys = object.keys();
+        while (keys.hasNext()) {
+            String key = (String) keys.next();
+            map.put(key, fromJson(object.get(key)));
+        }
+        return map;
+    }
+
+    public static List toList(JSONArray array) throws JSONException {
+        List list = new ArrayList();
+        for (int i = 0; i < array.length(); i++) {
+            list.add(fromJson(array.get(i)));
+        }
+        return list;
+    }
+
+    private static Object fromJson(Object json) throws JSONException {
+        if (json == JSONObject.NULL) {
+            return null;
+        } else if (json instanceof JSONObject) {
+            return toMap((JSONObject) json);
+        } else if (json instanceof JSONArray) {
+            return toList((JSONArray) json);
+        } else {
+            return json;
+        }
+    }
+    public static Map<String, Object> mapFromJson(JSONObject jsonObject){
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        Iterator keys = jsonObject.keys();
+        while (keys.hasNext()) {
+            String key = (String) keys.next();
+            try {
+                map.put(key, fromJson(jsonObject.get(key)));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return map;
+    }
+
+
+    public static String buildReferer(String referer) {
+        String ref = "app/" + BuildConfig.APPLICATION_ID + "/Android/" + Integer.toString(BuildConfig.VERSION_CODE) + "/" + referer;
+        return ref;
+    }
+
+    public static URL getRequest(String link, String referer) {
+        URL url = null;
+        try {
+            url = new URL(link);
+            HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+            connection.setRequestProperty("Referer", buildReferer(referer));
+            connection.connect();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return url;
     }
 }
