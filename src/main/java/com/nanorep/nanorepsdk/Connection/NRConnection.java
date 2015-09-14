@@ -22,12 +22,12 @@ public class NRConnection {
     public static void connectionWithRequest(String url, final NRConnectionListener listener) {
         NRDownloader downloader = new NRDownloader(new NRDownloader.NRDownloaderListener() {
             @Override
-            public void downloadCompleted(NRDownloader downloader, byte[] data, NRError error) {
+            public void downloadCompleted(NRDownloader downloader, Object data, NRError error) {
                 if (listener != null) {
                     if (error != null) {
                         listener.response(null, error);
                     } else if (data != null) {
-                        String jsonString = new String(data);
+                        String jsonString = new String((byte[])data);
                         HashMap<String, Object> retMap = new Gson().fromJson(jsonString, new TypeToken<HashMap<String, Object>>() {}.getType());
                         listener.response(retMap, null);
                     }
