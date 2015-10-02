@@ -2,6 +2,7 @@ package com.nanorep.nanorepsdk.Connection;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Path;
 
 import com.nanorep.nanorepsdk.BuildConfig;
 import com.nanorep.nanorepsdk.R;
@@ -14,6 +15,8 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -115,7 +118,33 @@ public class NRUtilities {
         try {
             url = new URL(link);
             HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-            connection.setRequestProperty("Referer", buildReferer(referer));
+            if (referer != null) {
+                connection.setRequestProperty("Referer", buildReferer(referer));
+            }
+            connection.connect();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return url;
+    }
+
+    public static URL getFAQRequest(HashMap<String, String> params) {
+        String api = params.get("api");
+        String link = "https://office.nanorep.com/~" + params.get("account");
+        URL url = null;
+        if (api != null) {
+            link += (api.equals("cnf") ? "/widget/scripts/" + api + ".json" : "/api/faq/v1/" + api + ".js") + "?";
+            params.remove("api");
+            for (String key: params.keySet()) {
+                link += key + "=" + params.get(key) + "&";
+            }
+            link = link.substring(0, link.length() - 1);
+        }
+        try {
+//            link = URLEncoder.encode(link, "utf-8");
+            url = new URL(link);
+            HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+            connection.setRequestProperty("Referer", buildReferer(params.get("referer")));
             connection.connect();
         } catch (Exception e) {
             e.printStackTrace();

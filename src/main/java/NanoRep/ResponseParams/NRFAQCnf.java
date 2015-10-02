@@ -11,7 +11,7 @@ public class NRFAQCnf {
     private HashMap<String, Object> mParams;
 
     public NRFAQCnf(HashMap<String, Object> params) {
-
+        mParams = params;
     }
 
     public String getCnfId() {

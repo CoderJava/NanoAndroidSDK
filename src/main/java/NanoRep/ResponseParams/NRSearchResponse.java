@@ -12,13 +12,13 @@ public class NRSearchResponse {
     private String mSearchId;
     private String mLangCode;
     private String mDetectedLanguage;
-    private ArrayList<String> mAnswerList;
+    private ArrayList<HashMap<String, Object>> mAnswerList;
 
     public NRSearchResponse(HashMap<String, Object> params) {
         mSearchId = (String)params.get("requestId");
         mLangCode = (String)params.get("kbLanguageCode");
         mDetectedLanguage = (String)params.get("detectedLanguage");
-        mAnswerList = (ArrayList<String>)params.get("answers");
+        mAnswerList = (ArrayList<HashMap<String, Object>>)params.get("answers");
     }
 
     public String getSearchId() {
@@ -33,7 +33,7 @@ public class NRSearchResponse {
         return mDetectedLanguage;
     }
 
-    public ArrayList<String> getAnswerList() {
+    public ArrayList<HashMap<String, Object>> getAnswerList() {
         return mAnswerList;
     }
 }

@@ -1,5 +1,7 @@
 package NanoRep;
 
+import com.nanorep.nanorepsdk.Connection.NRConnection;
+import com.nanorep.nanorepsdk.Connection.NRError;
 import com.nanorep.nanorepsdk.Connection.NRUtilities;
 
 import java.util.HashMap;
@@ -11,6 +13,8 @@ import NanoRep.Interfaces.NRFAQCompletion;
 import NanoRep.Interfaces.NRLikeCompletion;
 import NanoRep.RequestParams.NRFAQLikeParams;
 import NanoRep.RequestParams.NRFAQParams;
+import NanoRep.ResponseParams.NRFAQAnswer;
+import NanoRep.ResponseParams.NRFAQCnf;
 
 /**
  * Created by nissopa on 9/12/15.
@@ -50,15 +54,42 @@ public class NanoRepFAQ {
 
     }
 
-    public void answerWithId(String answerId, NRFAQAnswerCompletion completion) {
-
+    public void answerWithId(String answerId, final NRFAQAnswerCompletion completion) {
+        HashMap<String, String> params = getDefaultParams();
+        params.put("id", answerId);
+        params.put("i", Integer.toString(0));
+        params.put("api", "answer");
+        NRConnection.connectionWithRequest(NRUtilities.getFAQRequest(params), new NRConnection.NRConnectionListener() {
+            @Override
+            public void response(HashMap responseParam, NRError error) {
+                if (error != null) {
+                    completion.fetchAnswer(null, error);
+                } else if (responseParam != null){
+                    completion.fetchAnswer(new NRFAQAnswer(responseParam), null);
+                }
+            }
+        });
     }
 
     public void faqLike(NRFAQLikeParams faqLikeParams, NRLikeCompletion completion) {
 
     }
 
-    public void fetchDefaultFAQWithCompletion(NRDefaultFAQCompletion completion) {
-
+    public void fetchDefaultFAQWithCompletion(final NRDefaultFAQCompletion completion) {
+        HashMap<String, String> params = getDefaultParams();
+        params.put("api", "cnf");
+        NRConnection.connectionWithRequest(NRUtilities.getFAQRequest(params), new NRConnection.NRConnectionListener() {
+            @Override
+            public void response(HashMap responseParam, NRError error) {
+                if (error != null) {
+                    // TODO: fetch from cache
+                    completion.fetchDefaultFAQ(null, error);
+                } else {
+                    // TODO: cache the response
+                    completion.fetchDefaultFAQ(new NRFAQCnf(responseParam), null);
+                }
+                mDefaultParams = null;
+            }
+        });
     }
 }

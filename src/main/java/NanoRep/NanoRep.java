@@ -1,6 +1,5 @@
 package NanoRep;
 
-import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 
@@ -8,6 +7,8 @@ import com.nanorep.nanorepsdk.Connection.NRConnection;
 import com.nanorep.nanorepsdk.Connection.NRError;
 import com.nanorep.nanorepsdk.Connection.NRUtilities;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -35,6 +36,7 @@ public class NanoRep {
     private HashMap<String, NRSuggestions> mCachedSuggestions;
     private Handler mHandler;
     private String mReferer;
+    private NanoRepFAQ mFAQ;
 
     // APIs
     private String FetchSessionIdAPI = "hello";
@@ -96,7 +98,13 @@ public class NanoRep {
             completion.suggustions(mCachedSuggestions.get(text), null);
         } else {
             final HashMap<String, String> params = new HashMap<>();
-            params.put(TextKey, text);
+            String encodedText = null;
+            try {
+                encodedText = URLEncoder.encode(text, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            params.put(TextKey, encodedText != null ? encodedText : text);
             params.put(StemmingKey, "false");
             callAPI(SuggestionsAPI, params, new NRConnection.NRConnectionListener() {
                 @Override
@@ -106,7 +114,7 @@ public class NanoRep {
                         if (answers != null) {
                             ArrayList<String> arr = new ArrayList<String>();
                             for (String answer: answers) {
-                                String[] pipes = answer.split("|");
+                                String[] pipes = answer.split("\\|");
                                 String parsedAnswer = "";
                                 for (String comma: pipes) {
                                     String[] firstWords = comma.split(",");
@@ -134,19 +142,19 @@ public class NanoRep {
     }
 
     public void faqWithParams(NRFAQParams params, NRFAQCompletion completion) {
-
+        getFAQ().faqWithParams(params, completion);
     }
 
     public void answerWithId(String answerId, NRFAQAnswerCompletion completion) {
-
+        getFAQ().answerWithId(answerId, completion);
     }
 
     public void faqLike(NRFAQLikeParams faqLikeParams, NRLikeCompletion completion) {
-
+        getFAQ().faqLike(faqLikeParams, completion);
     }
 
     public void fetchDefaultFAQWithCompletion(NRDefaultFAQCompletion completion) {
-
+        getFAQ().fetchDefaultFAQWithCompletion(completion);
     }
 
     private ArrayList<Object[]> getWaitingAPICalls() {
@@ -177,19 +185,26 @@ public class NanoRep {
         return mHandler;
     }
 
+    public NanoRepFAQ getFAQ() {
+        if (mFAQ == null) {
+            mFAQ = new NanoRepFAQ(mAccountName);
+            mFAQ.setReferer(mReferer);
+        }
+        return mFAQ;
+    }
+
     private void startKeepAlive() {
         callAPI(KeepAliveAPI, new HashMap<String, String>(), new NRConnection.NRConnectionListener() {
             @Override
             public void response(HashMap responseParam, NRError error) {
                 if (error != null) {
                     Log.d("Keep Alive Error", error.getDescription());
-                } else if (((Integer)responseParam.get(NRConnection.NRStatusKey)).intValue() == 200) {
+                } else if (responseParam != null) {
                     getHandler().postDelayed(new Runnable() {
-                        @Override
                         public void run() {
                             NanoRep.this.startKeepAlive();
                         }
-                    }, (int)NanoRep.this.mDelay);
+                    }, (long) NanoRep.this.mDelay);
                 }
             }
         });
@@ -223,13 +238,12 @@ public class NanoRep {
                         completion.response(null, error);
                     } else if (responseParam != null && responseParam.get(SessionIdKey) != null) {
                         NanoRep.this.mSessionId = (String)responseParam.get(SessionIdKey);
-                        NanoRep.this.mDelay = ((Integer)responseParam.get(TimeoutKey)).floatValue() / 2;
-                        NanoRep.this.getHandler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                NanoRep.this.startKeepAlive();
-                            }
-                        }, (int) NanoRep.this.mDelay);
+                        NanoRep.this.mDelay = (((Integer)responseParam.get(TimeoutKey)).floatValue() / 2) * 1000;
+//                        getHandler().postDelayed(new Runnable() {
+//                            public void run() {
+//                                NanoRep.this.startKeepAlive();
+//                            }
+//                        }, (long) NanoRep.this.mDelay);
                         ArrayList<Object[]> temp = new ArrayList<Object[]>(NanoRep.this.getWaitingAPICalls());
                         for (Object[] arr: temp) {
                             NanoRep.this.callAPI((String)arr[0], (HashMap)arr[1], (NRConnection.NRConnectionListener)arr[2]);

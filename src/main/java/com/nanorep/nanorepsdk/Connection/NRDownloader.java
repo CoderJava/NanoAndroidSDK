@@ -2,11 +2,15 @@ package com.nanorep.nanorepsdk.Connection;
 import android.os.AsyncTask;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Created by nissopa on 9/12/15.
@@ -54,12 +58,28 @@ public class NRDownloader extends  AsyncTask <URL, Integer, Object> {
                 bos.write(next);
                 next = inputStream.read();
             }
-            bos.flush();
+
             data = bos.toByteArray();
+            bos.flush();
+            bos.close();
         }catch (Exception e){
+
             e.printStackTrace();
             return NRError.error("Connection", 1000, e.getMessage());
         }
         return data;
     }
+//    private Object getFileAtUrl(URL url) {
+//        String result = "";
+//        try {
+//            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8));
+//            String line = null;
+//            while ((line = in.readLine())  != null) {
+//                result += line;
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        return result;
+//    }
 }
