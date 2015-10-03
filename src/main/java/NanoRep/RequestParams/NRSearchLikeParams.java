@@ -1,5 +1,8 @@
 package NanoRep.RequestParams;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 /**
  * Created by nissopa on 9/13/15.
  */
@@ -11,8 +14,14 @@ public class NRSearchLikeParams extends NRRequestParams {
     private String mArticleId;
 
     public void setSearchQuery(String searchQuery) {
-        mSearchQuery = searchQuery;
-        setValue(searchQuery, "text");
+        String encodedText = null;
+        try {
+            encodedText = URLEncoder.encode(searchQuery, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        mSearchQuery = encodedText == null ? "" : encodedText;
+        setValue(mSearchQuery, "text");
     }
 
     public void setFeedbackType(int feedbackType) {

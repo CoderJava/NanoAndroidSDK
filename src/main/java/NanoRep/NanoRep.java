@@ -139,8 +139,17 @@ public class NanoRep {
         }
     }
 
-    public void sendLike(NRSearchLikeParams likeParams, NRLikeCompletion completion) {
-
+    public void sendLike(NRSearchLikeParams likeParams, final NRLikeCompletion completion) {
+        callAPI(LikeAPI, likeParams.getParams(), new NRConnection.NRConnectionListener() {
+            @Override
+            public void response(HashMap responseParam, NRError error) {
+                if (error != null) {
+                    completion.likeResult(0, false);
+                } else {
+                    completion.likeResult(((Integer)responseParam.get("type")).intValue(), responseParam.get("result").equals("True"));
+                }
+            }
+        });
     }
 
     public void changeContext(HashMap<String, String> context, NRSuccessCompletion completion) {
