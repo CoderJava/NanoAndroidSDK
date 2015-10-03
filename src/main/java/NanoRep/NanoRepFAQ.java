@@ -4,6 +4,8 @@ import com.nanorep.nanorepsdk.Connection.NRConnection;
 import com.nanorep.nanorepsdk.Connection.NRError;
 import com.nanorep.nanorepsdk.Connection.NRUtilities;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Stack;
 
@@ -71,8 +73,36 @@ public class NanoRepFAQ {
         });
     }
 
-    public void faqLike(NRFAQLikeParams faqLikeParams, NRLikeCompletion completion) {
-
+    public void faqLike(final NRFAQLikeParams faqLikeParams, final NRLikeCompletion completion) {
+        if (faqLikeParams != null) {
+            String likeUrl = "http://office.nanorep.com/~" + mAccountName + "/widget/faqAction.gif?";
+            for (String key : faqLikeParams.getParams().keySet()) {
+                likeUrl += key + "=" + faqLikeParams.getParams().get(key) + "&";
+            }
+            likeUrl = likeUrl.substring(0, likeUrl.length() - 1);
+            URL url = null;
+            try {
+//            link = URLEncoder.encode(link, "utf-8");
+                url = new URL(likeUrl);
+                HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+                connection.setRequestProperty("Referer", getReferer());
+                connection.connect();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (url != null) {
+                NRConnection.connectionWithRequest(url, new NRConnection.NRConnectionListener() {
+                    @Override
+                    public void response(HashMap responseParam, NRError error) {
+                        if (error != null) {
+                            completion.likeResult(0, false);
+                        } else {
+                            completion.likeResult(Integer.parseInt(faqLikeParams.getParams().get("type")), responseParam == null);
+                        }
+                    }
+                });
+            }
+        }
     }
 
     public void fetchDefaultFAQWithCompletion(final NRDefaultFAQCompletion completion) {

@@ -77,7 +77,13 @@ public class NanoRep {
             completion.searchResponse(mCachedSearches.get(text), null);
         } else {
             HashMap<String, String> params = new HashMap<>();
-            params.put(TextKey, text);
+            String encodedText = null;
+            try {
+                encodedText = URLEncoder.encode(text, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            params.put(TextKey, encodedText != null ? encodedText : text);
             callAPI(SearchAPI, params, new NRConnection.NRConnectionListener() {
                 @Override
                 public void response(HashMap responseParam, NRError error) {

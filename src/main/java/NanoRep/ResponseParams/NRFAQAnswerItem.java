@@ -24,8 +24,8 @@ public class NRFAQAnswerItem {
         return (String)mParams.get("label");
     }
 
-    public int getLikes() {
-        return Integer.parseInt((String)mParams.get("likes"));
+    public String getLikes() {
+        return ((Integer)mParams.get("likes")).toString();
     }
 
     public String getObjectId() {
