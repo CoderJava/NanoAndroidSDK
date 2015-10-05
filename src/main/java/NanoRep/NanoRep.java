@@ -1,6 +1,12 @@
 package NanoRep;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.util.Log;
 
 import com.nanorep.nanorepsdk.Connection.NRConnection;
@@ -16,6 +22,7 @@ import NanoRep.Interfaces.NRDefaultFAQCompletion;
 import NanoRep.Interfaces.NRFAQAnswerCompletion;
 import NanoRep.Interfaces.NRFAQCompletion;
 import NanoRep.Interfaces.NRLikeCompletion;
+import NanoRep.Interfaces.NRSpeechRecognizerCompletion;
 import NanoRep.Interfaces.NRSuccessCompletion;
 import NanoRep.RequestParams.NRFAQLikeParams;
 import NanoRep.RequestParams.NRFAQParams;
@@ -37,6 +44,9 @@ public class NanoRep {
     private Handler mHandler;
     private String mReferer;
     private NanoRepFAQ mFAQ;
+    private SpeechRecognizer mSpeechRecognizer;
+    private Intent mSpeechRecognizerIntent;
+
 
     // APIs
     private String FetchSessionIdAPI = "hello";
@@ -170,6 +180,75 @@ public class NanoRep {
 
     public void fetchDefaultFAQWithCompletion(NRDefaultFAQCompletion completion) {
         getFAQ().fetchDefaultFAQWithCompletion(completion);
+    }
+
+
+
+    public void startVoiceRecognition(Activity activity, final NRSpeechRecognizerCompletion completion) {
+        mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(activity);
+        mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, activity.getPackageName());
+
+        mSpeechRecognizer.setRecognitionListener(new RecognitionListener() {
+            @Override
+            public void onReadyForSpeech(Bundle params) {
+                Log.d("startVoiceRecognition", "onReadyForSpeech");
+            }
+
+            @Override
+            public void onBeginningOfSpeech() {
+                Log.d("startVoiceRecognition", "onBeginningOfSpeech");
+            }
+
+            @Override
+            public void onRmsChanged(float rmsdB) {
+                Log.d("startVoiceRecognition", "onRmsChanged");
+            }
+
+            @Override
+            public void onBufferReceived(byte[] buffer) {
+                Log.d("startVoiceRecognition", "onBufferReceived");
+            }
+
+            @Override
+            public void onEndOfSpeech() {
+                Log.d("startVoiceRecognition", "onEndOfSpeech");
+            }
+
+            @Override
+            public void onError(int error) {
+                Log.d("startVoiceRecognition", "onError");
+                completion.speechReconitionResults("");
+            }
+
+            @Override
+            public void onResults(Bundle results) {
+                Log.d("startVoiceRecognition", results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION).toString());
+                completion.speechReconitionResults(results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION).get(0));
+            }
+
+            @Override
+            public void onPartialResults(Bundle partialResults) {
+                Log.d("startVoiceRecognition", "onPartialResults");
+            }
+
+            @Override
+            public void onEvent(int eventType, Bundle params) {
+                Log.d("startVoiceRecognition", "onEvent");
+            }
+        });
+        Handler mainHandler = new Handler(activity.getMainLooper());
+
+        Runnable myRunnable = new Runnable() {
+            @Override
+            public void run() {
+                mSpeechRecognizer.startListening(mSpeechRecognizerIntent);
+            } // This is your code
+        };
+        mainHandler.post(myRunnable);
+
+
     }
 
     private ArrayList<Object[]> getWaitingAPICalls() {
