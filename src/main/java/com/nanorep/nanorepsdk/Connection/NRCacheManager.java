@@ -21,11 +21,14 @@ import java.util.StringTokenizer;
  */
 public class NRCacheManager extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
-    private static final String DATABASE_NAME = "FAQCache.db";
-    private static final String TABLE_ANSWERS = "answers";
+    private static final String DATABASE_NAME = "CacheNano.db";
+    private static final String TABLE_ANSWERS = "ANSWERS";
 
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_VALUE = "value";
+
+    private static NRCacheManager mCacheManager;
+    private static Context mContext;
 
 
     public NRCacheManager(Context context) {
@@ -34,9 +37,9 @@ public class NRCacheManager extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_PRODUCTS_TABLE = "CREATE TABLE " +
+        String CREATE_PRODUCTS_TABLE = "Create table IF NOT EXISTS " +
                 TABLE_ANSWERS + "("
-                + COLUMN_ID + " INTEGER PRIMARY KEY," + COLUMN_VALUE
+                + COLUMN_ID + " TEXT," + COLUMN_VALUE
                 + " BLOB)";
         db.execSQL(CREATE_PRODUCTS_TABLE);
     }
@@ -47,14 +50,20 @@ public class NRCacheManager extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public static HashMap<String, Object> getAnswerById(Context context, String link) {
-        String query = "Select * FROM " + TABLE_ANSWERS + " WHERE " + COLUMN_ID + " =  \"" + md5(link) + "\"";
-        NRCacheManager manager = new NRCacheManager(context);
-        SQLiteDatabase db = manager.getWritableDatabase();
+    private static synchronized NRCacheManager getCacheManager() {
+        if (mCacheManager == null) {
+            mCacheManager = new NRCacheManager(mContext);
+        }
+        return mCacheManager;
+    }
+
+    public static HashMap<String, Object> getAnswerById(Context context, String answerId) {
+        mContext = context;
+        String query = "Select * FROM " + TABLE_ANSWERS + " WHERE " + COLUMN_ID + " =  \"" + answerId + "\"";
+        SQLiteDatabase db = getCacheManager().getReadableDatabase();
         Cursor cursor = db.rawQuery(query, null);
         byte[] storedData = null;
         if (cursor.moveToFirst()) {
-            cursor.moveToFirst();
             storedData = cursor.getBlob(1);
             cursor.close();
             if (storedData != null) {
@@ -72,20 +81,20 @@ public class NRCacheManager extends SQLiteOpenHelper {
         return null;
     }
 
-    public static void storeAnswerById(Context context, String link, HashMap<String, Object> answerId) {
+    public static void storeAnswerById(Context context, String answerId, HashMap<String, Object> answerParams) {
         // Convert Map to byte array
+        mContext = context;
         ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
         ObjectOutputStream out = null;
         try {
             out = new ObjectOutputStream(byteOut);
-            out.writeObject(answerId);
+            out.writeObject(answerParams);
             byte[] data = byteOut.toByteArray();
             ContentValues values = new ContentValues();
-            values.put(COLUMN_ID, md5(link));
+            values.put(COLUMN_ID, answerId.trim());
             values.put(COLUMN_VALUE, data);
-            NRCacheManager manager = new NRCacheManager(context);
-            SQLiteDatabase db = manager.getWritableDatabase();
-            db.insert(TABLE_ANSWERS, null, values);
+            SQLiteDatabase db = getCacheManager().getWritableDatabase();
+            db.insertWithOnConflict(TABLE_ANSWERS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
             db.close();
             out.close();
             byteOut.close();
@@ -94,28 +103,5 @@ public class NRCacheManager extends SQLiteOpenHelper {
         }
     }
 
-    public static final String md5(final String s) {
-        final String MD5 = "MD5";
-        try {
-            // Create MD5 Hash
-            java.security.MessageDigest digest = java.security.MessageDigest
-                    .getInstance(MD5);
-            digest.update(s.getBytes());
-            byte messageDigest[] = digest.digest();
 
-            // Create Hex String
-            StringBuilder hexString = new StringBuilder();
-            for (byte aMessageDigest : messageDigest) {
-                String h = Integer.toHexString(0xFF & aMessageDigest);
-                while (h.length() < 2)
-                    h = "0" + h;
-                hexString.append(h);
-            }
-            return hexString.toString();
-
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return "";
-    }
 }

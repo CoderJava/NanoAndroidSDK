@@ -1,6 +1,7 @@
 package NanoRep;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -35,7 +36,7 @@ import NanoRep.ResponseParams.NRSuggestions;
  */
 public class NanoRep {
     private String mAccountName;
-    private HashMap<String, String> mContext;
+    private HashMap<String, String> mNanoContext;
     private String mSessionId;
     private float mDelay;
     private ArrayList<Object[]> mWaitingAPICalls;
@@ -46,6 +47,7 @@ public class NanoRep {
     private NanoRepFAQ mFAQ;
     private SpeechRecognizer mSpeechRecognizer;
     private Intent mSpeechRecognizerIntent;
+    private Context mContext;
 
 
     // APIs
@@ -73,9 +75,10 @@ public class NanoRep {
         public void suggustions(NRSuggestions suggestions, NRError error);
     }
 
-    public NanoRep(String accountName, HashMap<String, String> context) {
-        mAccountName = accountName;
+    public NanoRep(Context context, String accountName, HashMap<String, String> nanoContext) {
         mContext = context;
+        mAccountName = accountName;
+        mNanoContext = nanoContext;
     }
 
     public void setReferer(String referer) {
@@ -281,7 +284,7 @@ public class NanoRep {
 
     public NanoRepFAQ getFAQ() {
         if (mFAQ == null) {
-            mFAQ = new NanoRepFAQ(mAccountName);
+            mFAQ = new NanoRepFAQ(mContext, mAccountName);
             mFAQ.setReferer(mReferer);
         }
         return mFAQ;
@@ -323,7 +326,7 @@ public class NanoRep {
             map.put("nostats", "false");
             map.put("url", "Mobile");
             if (mContext != null) {
-                map.put("ctx", NRUtilities.wrappedContext(mContext));
+                map.put("ctx", NRUtilities.wrappedContext(mNanoContext));
             }
             api(FetchSessionIdAPI, map, new NRConnection.NRConnectionListener() {
                 @Override
