@@ -1,5 +1,8 @@
 package NanoRep;
 
+import android.content.Context;
+
+import com.nanorep.nanorepsdk.Connection.NRCacheManager;
 import com.nanorep.nanorepsdk.Connection.NRConnection;
 import com.nanorep.nanorepsdk.Connection.NRError;
 import com.nanorep.nanorepsdk.Connection.NRUtilities;
@@ -7,6 +10,7 @@ import com.nanorep.nanorepsdk.Connection.NRUtilities;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Stack;
 
 import NanoRep.Interfaces.NRDefaultFAQCompletion;
@@ -24,9 +28,11 @@ import NanoRep.ResponseParams.NRFAQCnf;
 public class NanoRepFAQ {
     private String mAccountName;
     private String mReferer;
+    private Context mContext;
     private HashMap<String, String> mDefaultParams;
 
-    public NanoRepFAQ(String accountName) {
+    public NanoRepFAQ(Context context, String accountName) {
+        mContext = context;
         mAccountName = accountName;
     }
 
@@ -56,7 +62,7 @@ public class NanoRepFAQ {
 
     }
 
-    public void answerWithId(String answerId, final NRFAQAnswerCompletion completion) {
+    public void answerWithId(final String answerId, final NRFAQAnswerCompletion completion) {
         HashMap<String, String> params = getDefaultParams();
         params.put("id", answerId);
         params.put("i", Integer.toString(0));
@@ -65,9 +71,15 @@ public class NanoRepFAQ {
             @Override
             public void response(HashMap responseParam, NRError error) {
                 if (error != null) {
-                    completion.fetchAnswer(null, error);
+                    HashMap<String, Object> storedResponse = NRCacheManager.getAnswerById(mContext, answerId);
+                    if (storedResponse != null) {
+                        completion.fetchAnswer(new NRFAQAnswer(storedResponse), null);
+                    } else {
+                        completion.fetchAnswer(null, error);
+                    }
                 } else if (responseParam != null){
                     completion.fetchAnswer(new NRFAQAnswer(responseParam), null);
+                    NRCacheManager.storeAnswerById(mContext, answerId, responseParam);
                 }
             }
         });
@@ -106,17 +118,22 @@ public class NanoRepFAQ {
     }
 
     public void fetchDefaultFAQWithCompletion(final NRDefaultFAQCompletion completion) {
-        HashMap<String, String> params = getDefaultParams();
+        final HashMap<String, String> params = getDefaultParams();
         params.put("api", "cnf");
+//        final String id = NRUtilities.md5(NRUtilities.getFAQRequest(params));
         NRConnection.connectionWithRequest(NRUtilities.getFAQRequest(params), new NRConnection.NRConnectionListener() {
             @Override
             public void response(HashMap responseParam, NRError error) {
                 if (error != null) {
-                    // TODO: fetch from cache
-                    completion.fetchDefaultFAQ(null, error);
+                    HashMap<String, Object> cachedResponse = NRCacheManager.getAnswerById(mContext, NRUtilities.md5(params));
+                    if (cachedResponse != null) {
+                        completion.fetchDefaultFAQ(new NRFAQCnf(cachedResponse), null);
+                    } else {
+                        completion.fetchDefaultFAQ(null, error);
+                    }
                 } else {
-                    // TODO: cache the response
                     completion.fetchDefaultFAQ(new NRFAQCnf(responseParam), null);
+                    NRCacheManager.storeAnswerById(mContext, NRUtilities.md5(params), responseParam);
                 }
                 mDefaultParams = null;
             }

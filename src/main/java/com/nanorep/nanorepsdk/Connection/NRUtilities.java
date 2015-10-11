@@ -17,6 +17,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.security.Key;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -150,5 +151,40 @@ public class NRUtilities {
             e.printStackTrace();
         }
         return url;
+    }
+
+    public static final String md5(HashMap<String, String> params) {
+        final String MD5 = "MD5";
+        String api = params.get("api");
+        String link = "https://office.nanorep.com/~" + params.get("account");
+        if (api != null) {
+            link += (api.equals("cnf") ? "/widget/scripts/" + api + ".json" : "/api/faq/v1/" + api + ".js") + "?";
+            params.remove("api");
+            for (String key: params.keySet()) {
+                link += key + "=" + params.get(key) + "&";
+            }
+            link = link.substring(0, link.length() - 1);
+        }
+        try {
+            // Create MD5 Hash
+            java.security.MessageDigest digest = java.security.MessageDigest
+                    .getInstance(MD5);
+            digest.update(link.getBytes());
+            byte messageDigest[] = digest.digest();
+
+            // Create Hex String
+            StringBuilder hexString = new StringBuilder();
+            for (byte aMessageDigest : messageDigest) {
+                String h = Integer.toHexString(0xFF & aMessageDigest);
+                while (h.length() < 2)
+                    h = "0" + h;
+                hexString.append(h);
+            }
+            return hexString.toString();
+
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }
