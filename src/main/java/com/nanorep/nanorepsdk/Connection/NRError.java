@@ -10,6 +10,9 @@ public class NRError {
 
     public static NRError error(String domain, int code, String description) {
         NRError error = new NRError();
+        error.setDomain(domain);
+        error.setCode(code);
+        error.setmDescription(description);
         return error;
     }
 

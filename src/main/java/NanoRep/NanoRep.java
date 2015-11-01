@@ -42,12 +42,13 @@ public class NanoRep {
     private ArrayList<Object[]> mWaitingAPICalls;
     private HashMap<String, NRSearchResponse> mCachedSearches;
     private HashMap<String, NRSuggestions> mCachedSuggestions;
-    private Handler mHandler;
     private String mReferer;
     private NanoRepFAQ mFAQ;
     private SpeechRecognizer mSpeechRecognizer;
     private Intent mSpeechRecognizerIntent;
     private Context mContext;
+    private String mDomain;
+    private String mKnowledgeBase;
 
 
     // APIs
@@ -75,10 +76,18 @@ public class NanoRep {
         public void suggustions(NRSuggestions suggestions, NRError error);
     }
 
-    public NanoRep(Context context, String accountName, HashMap<String, String> nanoContext) {
+    public NanoRep(Context context, String domain, String accountName, String knowledgeBase, HashMap<String, String> nanoContext) {
         mContext = context;
         mAccountName = accountName;
         mNanoContext = nanoContext;
+        mDomain = domain;
+        mKnowledgeBase = knowledgeBase;
+    }
+
+    public NanoRep(Context context, String accountName) {
+        mContext = context;
+        mAccountName = accountName;
+        mDomain = "office.nanorep.com";
     }
 
     public void setReferer(String referer) {
@@ -97,13 +106,14 @@ public class NanoRep {
                 e.printStackTrace();
             }
             params.put(TextKey, encodedText != null ? encodedText : text);
-            callAPI(SearchAPI, params, new NRConnection.NRConnectionListener() {
+            params.put(NRUtilities.ApiNameKey, SearchAPI);
+            callAPI(params, new NRConnection.NRConnectionListener() {
                 @Override
-                public void response(HashMap responseParam, NRError error) {
+                public void response(Object responseParam, NRError error) {
                     if (error != null) {
                         completion.searchResponse(null, error);
                     } else if (responseParam != null) {
-                        NRSearchResponse response = new NRSearchResponse(responseParam);
+                        NRSearchResponse response = new NRSearchResponse((HashMap)responseParam);
                         NanoRep.this.getCachedSearches().put(text, response);
                         completion.searchResponse(response, null);
                     }
@@ -125,25 +135,26 @@ public class NanoRep {
             }
             params.put(TextKey, encodedText != null ? encodedText : text);
             params.put(StemmingKey, "false");
-            callAPI(SuggestionsAPI, params, new NRConnection.NRConnectionListener() {
+            params.put(NRUtilities.ApiNameKey, SuggestionsAPI);
+            callAPI(params, new NRConnection.NRConnectionListener() {
                 @Override
-                public void response(HashMap responseParam, NRError error) {
+                public void response(Object responseParam, NRError error) {
                     if (responseParam != null) {
-                        ArrayList<String> answers = (ArrayList)responseParam.get("a");
+                        ArrayList<String> answers = (ArrayList) ((HashMap)responseParam).get("a");
                         if (answers != null) {
                             ArrayList<String> arr = new ArrayList<String>();
-                            for (String answer: answers) {
+                            for (String answer : answers) {
                                 String[] pipes = answer.split("\\|");
                                 String parsedAnswer = "";
-                                for (String comma: pipes) {
+                                for (String comma : pipes) {
                                     String[] firstWords = comma.split(",");
                                     parsedAnswer += firstWords[0] + " ";
                                 }
                                 parsedAnswer = parsedAnswer.substring(0, parsedAnswer.length() - 1);
                                 arr.add(parsedAnswer);
                             }
-                            responseParam.put("a", arr);
-                            NanoRep.this.getCachedSuggestions().put(text, new NRSuggestions(responseParam));
+                            ((HashMap)responseParam).put("a", arr);
+                            NanoRep.this.getCachedSuggestions().put(text, new NRSuggestions((HashMap)responseParam));
                         }
                         completion.suggustions(NanoRep.this.mCachedSuggestions.get(text), null);
                     }
@@ -153,13 +164,15 @@ public class NanoRep {
     }
 
     public void sendLike(NRSearchLikeParams likeParams, final NRLikeCompletion completion) {
-        callAPI(LikeAPI, likeParams.getParams(), new NRConnection.NRConnectionListener() {
+        HashMap<String, String> params = likeParams.getParams();
+        params.put(NRUtilities.ApiNameKey, LikeAPI);
+        callAPI(params, new NRConnection.NRConnectionListener() {
             @Override
-            public void response(HashMap responseParam, NRError error) {
+            public void response(Object responseParam, NRError error) {
                 if (error != null) {
                     completion.likeResult(0, false);
                 } else {
-                    completion.likeResult(((Integer)responseParam.get("type")).intValue(), responseParam.get("result").equals("True"));
+                    completion.likeResult(((Integer) ((HashMap)responseParam).get("type")).intValue(), ((HashMap)responseParam).get("result").equals("True"));
                 }
             }
         });
@@ -182,7 +195,7 @@ public class NanoRep {
     }
 
     public void fetchDefaultFAQWithCompletion(NRDefaultFAQCompletion completion) {
-        getFAQ().fetchDefaultFAQWithCompletion(completion);
+        getFAQ().fetchDefaultFAQWithCompletion(mKnowledgeBase, completion);
     }
 
 
@@ -192,6 +205,7 @@ public class NanoRep {
         mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, activity.getPackageName());
+        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 2000000);
 
         mSpeechRecognizer.setRecognitionListener(new RecognitionListener() {
             @Override
@@ -275,29 +289,25 @@ public class NanoRep {
         return mCachedSuggestions;
     }
 
-    private Handler getHandler() {
-        if (mHandler == null) {
-            mHandler = new Handler();
-        }
-        return mHandler;
-    }
-
     public NanoRepFAQ getFAQ() {
         if (mFAQ == null) {
-            mFAQ = new NanoRepFAQ(mContext, mAccountName);
+            mFAQ = new NanoRepFAQ(mContext, mDomain, mAccountName, NRUtilities.wrappedContext(mNanoContext));
             mFAQ.setReferer(mReferer);
         }
         return mFAQ;
     }
 
     private void startKeepAlive() {
-        callAPI(KeepAliveAPI, new HashMap<String, String>(), new NRConnection.NRConnectionListener() {
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put(NRUtilities.ApiNameKey, KeepAliveAPI);
+        callAPI(params, new NRConnection.NRConnectionListener() {
             @Override
-            public void response(HashMap responseParam, NRError error) {
+            public void response(Object responseParam, NRError error) {
                 if (error != null) {
                     Log.d("Keep Alive Error", error.getDescription());
                 } else if (responseParam != null) {
-                    getHandler().postDelayed(new Runnable() {
+                    Handler timer = new Handler();
+                    timer.postDelayed(new Runnable() {
                         public void run() {
                             NanoRep.this.startKeepAlive();
                         }
@@ -307,43 +317,44 @@ public class NanoRep {
         });
     }
 
-    private void callAPI(String apiName, HashMap<String, String> params, final NRConnection.NRConnectionListener completion) {
+    private void callAPI(HashMap<String, String> params, final NRConnection.NRConnectionListener completion) {
         if (mSessionId != null) {
             params.put(SidKey, mSessionId);
-            api(apiName, params, completion);
+            api(params, completion);
         } else if (false) {
             // TODO: Check for connection
         } else {
-            if (apiName != null && completion != null) {
-                if (params == null) {
-                    params = new HashMap<>();
-                }
-                Object[] arr = {apiName, params, completion};
+            if (completion != null) {
+                Object[] arr = {params, completion};
                 getWaitingAPICalls().add(arr);
             }
             HashMap<String, String> map = new HashMap<>();
-            map.put("kb", "qa");
+            if (mKnowledgeBase != null) {
+                map.put("kb", mKnowledgeBase);
+            }
             map.put("nostats", "false");
             map.put("url", "Mobile");
+            map.put(NRUtilities.ApiNameKey, FetchSessionIdAPI);
             if (mContext != null) {
                 map.put("ctx", NRUtilities.wrappedContext(mNanoContext));
             }
-            api(FetchSessionIdAPI, map, new NRConnection.NRConnectionListener() {
+            api(map, new NRConnection.NRConnectionListener() {
                 @Override
-                public void response(HashMap responseParam, NRError error) {
+                public void response(Object responseParam, NRError error) {
                     if (error != null) {
                         completion.response(null, error);
-                    } else if (responseParam != null && responseParam.get(SessionIdKey) != null) {
-                        NanoRep.this.mSessionId = (String)responseParam.get(SessionIdKey);
-                        NanoRep.this.mDelay = (((Integer)responseParam.get(TimeoutKey)).floatValue() / 2) * 1000;
-//                        getHandler().postDelayed(new Runnable() {
-//                            public void run() {
-//                                NanoRep.this.startKeepAlive();
-//                            }
-//                        }, (long) NanoRep.this.mDelay);
+                    } else if (responseParam != null && ((HashMap)responseParam).get(SessionIdKey) != null) {
+                        NanoRep.this.mSessionId = (String)((HashMap)responseParam).get(SessionIdKey);
+                        NanoRep.this.mDelay = (((Integer)((HashMap)responseParam).get(TimeoutKey)).floatValue() / 2) * 1000;
+                        Handler timer = new Handler();
+                        timer.postDelayed(new Runnable() {
+                            public void run() {
+                                NanoRep.this.startKeepAlive();
+                            }
+                        }, (long) NanoRep.this.mDelay);
                         ArrayList<Object[]> temp = new ArrayList<Object[]>(NanoRep.this.getWaitingAPICalls());
                         for (Object[] arr: temp) {
-                            NanoRep.this.callAPI((String)arr[0], (HashMap)arr[1], (NRConnection.NRConnectionListener)arr[2]);
+                            NanoRep.this.callAPI((HashMap)arr[0], (NRConnection.NRConnectionListener)arr[1]);
                             NanoRep.this.getWaitingAPICalls().remove(arr);
                         }
                         temp = null;
@@ -354,8 +365,9 @@ public class NanoRep {
         }
     }
 
-    private void api(String apiName, HashMap<String, String> params, NRConnection.NRConnectionListener completion) {
-        String link = NRUtilities.buildURL(mAccountName, apiName, params);
+    private void api(HashMap<String, String> params, NRConnection.NRConnectionListener completion) {
+        params.putAll(getFAQ().getDefaultParams());
+        String link = NRUtilities.buildURL(params);
         NRConnection.connectionWithRequest(NRUtilities.getRequest(link, mReferer), completion);
     }
 }

@@ -1,0 +1,50 @@
+
+{
+    "domains": [
+        "office.nanorep.com",
+        "my.nanorep.com"
+    ],
+    "accounts": {
+        "vodafoneuk": [
+            "English",
+            "PreProduction"
+        ],
+        "qa": [
+            "qa",
+            "he",
+            "context",
+            "Swidish",
+            "Russian",
+            "Spanish"
+        ],
+        "myhertiage": [
+            "English",
+            "Dutch",
+            "French",
+            "German",
+            "Herbrew",
+            "Italian",
+            "Norwegian",
+            "Polish",
+            "Portuguse",
+            "Spanish",
+            "Swedish"
+        ],
+        "chegg": [
+            "Internal",
+            "Main",
+            "Test",
+            "Tutors"
+        ],
+        "build": [
+            "Build-Network",
+            "Build.UK",
+            "Internal",
+            "LightingDirect"
+        ],
+        "nissimdemo": [
+            "English",
+            "context"
+        ]
+    }
+}

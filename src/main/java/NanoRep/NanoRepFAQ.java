@@ -9,7 +9,9 @@ import com.nanorep.nanorepsdk.Connection.NRUtilities;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 import java.util.Stack;
 
@@ -29,29 +31,32 @@ public class NanoRepFAQ {
     private String mAccountName;
     private String mReferer;
     private Context mContext;
+    private String mDomain;
     private HashMap<String, String> mDefaultParams;
+    private String mNanoContext;
 
-    public NanoRepFAQ(Context context, String accountName) {
+    public NanoRepFAQ(Context context, String domain,  String accountName, String nanoContext) {
         mContext = context;
         mAccountName = accountName;
+        mDomain = domain;
+        mNanoContext = nanoContext;
     }
 
     private String getReferer() {
         if (mReferer == null) {
-            mReferer = NRUtilities.buildReferer("mobile");
-        } else {
-            mReferer = NRUtilities.buildReferer(mReferer);
+            mReferer = "mobile";
         }
         return mReferer;
     }
 
-    private HashMap<String, String> getDefaultParams() {
+    public HashMap<String, String> getDefaultParams() {
         if (mDefaultParams == null) {
             mDefaultParams = new HashMap<String, String>();
-            mDefaultParams.put("account", mAccountName);
-            mDefaultParams.put("referer", getReferer());
+            mDefaultParams.put(NRUtilities.DomainKey, mDomain);
+            mDefaultParams.put(NRUtilities.AccountNameKey, mAccountName);
+            mDefaultParams.put("referer", NRUtilities.buildReferer(getReferer()));
         }
-        return mDefaultParams;
+        return new HashMap<String, String>(mDefaultParams);
     }
 
     public void setReferer(String referer) {
@@ -66,10 +71,10 @@ public class NanoRepFAQ {
         HashMap<String, String> params = getDefaultParams();
         params.put("id", answerId);
         params.put("i", Integer.toString(0));
-        params.put("api", "answer");
+        params.put("api", "answer.js");
         NRConnection.connectionWithRequest(NRUtilities.getFAQRequest(params), new NRConnection.NRConnectionListener() {
             @Override
-            public void response(HashMap responseParam, NRError error) {
+            public void response(Object responseParam, NRError error) {
                 if (error != null) {
                     HashMap<String, Object> storedResponse = NRCacheManager.getAnswerById(mContext, answerId);
                     if (storedResponse != null) {
@@ -78,8 +83,8 @@ public class NanoRepFAQ {
                         completion.fetchAnswer(null, error);
                     }
                 } else if (responseParam != null){
-                    completion.fetchAnswer(new NRFAQAnswer(responseParam), null);
-                    NRCacheManager.storeAnswerById(mContext, answerId, responseParam);
+                    completion.fetchAnswer(new NRFAQAnswer((HashMap)responseParam), null);
+                    NRCacheManager.storeAnswerById(mContext, answerId, (HashMap)responseParam);
                 }
             }
         });
@@ -87,7 +92,7 @@ public class NanoRepFAQ {
 
     public void faqLike(final NRFAQLikeParams faqLikeParams, final NRLikeCompletion completion) {
         if (faqLikeParams != null) {
-            String likeUrl = "http://office.nanorep.com/~" + mAccountName + "/widget/faqAction.gif?";
+            String likeUrl = "http://" + mDomain + "/~" + mAccountName + "/widget/faqAction.gif?";
             for (String key : faqLikeParams.getParams().keySet()) {
                 likeUrl += key + "=" + faqLikeParams.getParams().get(key) + "&";
             }
@@ -97,7 +102,7 @@ public class NanoRepFAQ {
 //            link = URLEncoder.encode(link, "utf-8");
                 url = new URL(likeUrl);
                 HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-                connection.setRequestProperty("Referer", getReferer());
+                connection.setRequestProperty("Referer", NRUtilities.buildReferer(getReferer()));
                 connection.connect();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -105,7 +110,7 @@ public class NanoRepFAQ {
             if (url != null) {
                 NRConnection.connectionWithRequest(url, new NRConnection.NRConnectionListener() {
                     @Override
-                    public void response(HashMap responseParam, NRError error) {
+                    public void response(Object responseParam, NRError error) {
                         if (error != null) {
                             completion.likeResult(0, false);
                         } else {
@@ -117,13 +122,40 @@ public class NanoRepFAQ {
         }
     }
 
-    public void fetchDefaultFAQWithCompletion(final NRDefaultFAQCompletion completion) {
+    public void fetchFAQList(final HashMap cnfResponse, final NRDefaultFAQCompletion completion) {
+        HashMap<String, String> params = getDefaultParams();
+        params.put(NRUtilities.ApiNameKey, "list.json");
+        if (mNanoContext != null && mNanoContext.length() > 0) {
+            params.put("context", mNanoContext);
+        }
+        final HashMap<String, String> paramsFinal = params;
+        NRConnection.connectionWithRequest(NRUtilities.getFAQRequest(params), new NRConnection.NRConnectionListener() {
+            @Override
+            public void response(Object responseParam, NRError error) {
+                if (error != null) {
+                    HashMap<String, Object> cachedResponse = NRCacheManager.getAnswerById(mContext, NRUtilities.md5(paramsFinal));
+                    if (cachedResponse == null) {
+                        completion.fetchDefaultFAQ(null, error);
+                    } else {
+                        cnfResponse.put("faqData", responseParam);
+                        completion.fetchDefaultFAQ(new NRFAQCnf(cnfResponse), null);
+                    }
+                } else if (responseParam != null) {
+                    cnfResponse.put("faqData", responseParam);
+                    completion.fetchDefaultFAQ(new NRFAQCnf(cnfResponse), null);
+                }
+            }
+        });
+    }
+
+    public void fetchDefaultFAQWithCompletion(String knowledgeBase, final NRDefaultFAQCompletion completion) {
         final HashMap<String, String> params = getDefaultParams();
-        params.put("api", "cnf");
+        params.put(NRUtilities.ApiNameKey, "cnf.json");
+        params.put("kb", knowledgeBase);
 //        final String id = NRUtilities.md5(NRUtilities.getFAQRequest(params));
         NRConnection.connectionWithRequest(NRUtilities.getFAQRequest(params), new NRConnection.NRConnectionListener() {
             @Override
-            public void response(HashMap responseParam, NRError error) {
+            public void response(Object responseParam, NRError error) {
                 if (error != null) {
                     HashMap<String, Object> cachedResponse = NRCacheManager.getAnswerById(mContext, NRUtilities.md5(params));
                     if (cachedResponse != null) {
@@ -132,8 +164,15 @@ public class NanoRepFAQ {
                         completion.fetchDefaultFAQ(null, error);
                     }
                 } else {
-                    completion.fetchDefaultFAQ(new NRFAQCnf(responseParam), null);
-                    NRCacheManager.storeAnswerById(mContext, NRUtilities.md5(params), responseParam);
+                    NRFAQCnf cnf = new NRFAQCnf((HashMap)responseParam);
+                    if (cnf.getFaqData() == null) {
+                        completion.fetchDefaultFAQ(null, NRError.error("com.nanorepfaq", 1002, "faqData empty"));
+                    } else if (cnf.getFaqData() instanceof String || (cnf.getFaqData() instanceof ArrayList && ((ArrayList)cnf.getFaqData()).size() == 0)) {
+                        fetchFAQList((HashMap)responseParam, completion);
+                    } else {
+                        completion.fetchDefaultFAQ(new NRFAQCnf((HashMap)responseParam), null);
+                        NRCacheManager.storeAnswerById(mContext, NRUtilities.md5(params), (HashMap)responseParam);
+                    }
                 }
                 mDefaultParams = null;
             }

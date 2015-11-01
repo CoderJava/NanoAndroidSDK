@@ -3,6 +3,8 @@ package com.nanorep.nanorepsdk.Connection;
 
 
 
+import android.util.Log;
+
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,10 +17,11 @@ public class NRConnection {
 
     static private ArrayList<NRDownloader> mConnections;
     public interface NRConnectionListener {
-        public void response(HashMap responseParam, NRError error);
+        public void response(Object responseParam, NRError error);
     }
 
     public static void connectionWithRequest(URL url, final NRConnectionListener listener) {
+        Log.d("RequestURL", url.toString());
         NRDownloader downloader = new NRDownloader(new NRDownloader.NRDownloaderListener() {
             @Override
             public void downloadCompleted(NRDownloader downloader, Object data, NRError error) {
@@ -27,7 +30,7 @@ public class NRConnection {
                         listener.response(null, error);
                     } else if (data != null) {
                         String jsonString = new String((byte[])data);
-                        HashMap<String, Object> retMap = (HashMap)NRUtilities.jsonStringToMap(jsonString);
+                        Object retMap = NRUtilities.jsonStringToPropertyList(jsonString);
                         listener.response(retMap, null);
                     }
                 }

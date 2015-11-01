@@ -7,7 +7,7 @@ import java.util.HashMap;
  * Created by nissopa on 9/13/15.
  */
 public class NRFAQCnf {
-    private ArrayList<NRFAQCnfItem> mFaqData;
+    private Object mFaqData;
     private HashMap<String, Object> mParams;
 
     public NRFAQCnf(HashMap<String, Object> params) {
@@ -30,17 +30,22 @@ public class NRFAQCnf {
         return (String)mParams.get("kbLanguageCode");
     }
 
-    public ArrayList<NRFAQCnfItem> getFaqData() {
+    public Object getFaqData() {
         ArrayList<NRFAQCnfItem> arr = null;
-        ArrayList<HashMap<String, Object>> data = (ArrayList)mParams.get("faqData");
-        if (mFaqData == null && data.size() > 0) {
+//        ArrayList<HashMap<String, Object>> data = (ArrayList)mParams.get("faqData");
+        Object data = mParams.get("faqData");
+        if (data == null) {
+            return null;
+        }
+        if (data instanceof ArrayList) {
             arr = new ArrayList<NRFAQCnfItem>();
-            for (HashMap<String, Object> map: data) {
+            for (HashMap<String, Object> map: (ArrayList<HashMap<String, Object>>)data) {
                 arr.add(new NRFAQCnfItem(map));
             }
             mFaqData = new ArrayList<NRFAQCnfItem>(arr);
             arr = null;
+            return mFaqData;
         }
-        return mFaqData;
+        return data;
     }
 }

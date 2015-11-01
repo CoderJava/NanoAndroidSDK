@@ -1,22 +1,16 @@
 package com.nanorep.nanorepsdk.Connection;
 
-import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Path;
+import android.util.Base64;
 
 import com.nanorep.nanorepsdk.BuildConfig;
-import com.nanorep.nanorepsdk.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,17 +18,21 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * Created by nissopa on 9/14/15.
  */
 public class NRUtilities {
 
-    public static String buildURL(String accountName, String apiName, HashMap<String, String> params) {
-        String link = "https://office.nanorep.com/~" + accountName + "/api/widget/v1/" + apiName + ".js?";
+    public static String AccountNameKey = "account";
+    public static String ApiNameKey = "api";
+    public static String DomainKey = "DomainKey";
+
+    public static String buildURL(HashMap<String, String> params) {
+        String link =  "http://" + params.get(DomainKey) + "/~" + params.get(AccountNameKey) + "/api/widget/v1/" + params.get(ApiNameKey) + ".js?";
+        params.remove(DomainKey);
+        params.remove(AccountNameKey);
+        params.remove(ApiNameKey);
         if (params != null) {
             List<String> keys = new ArrayList<String>(params.keySet());
             Collections.sort(keys);
@@ -48,22 +46,35 @@ public class NRUtilities {
 
     public static String wrappedContext(HashMap<String, String > context) {
         String _context = "";
+        if (context == null) {
+            return "";
+        }
         for (String key: context.keySet()) {
             _context += key + ":" + context.get(key) + ",";
         }
         _context = _context.substring(0, _context.length() - 1);
-        return _context;
+        return Base64.encodeToString(_context.getBytes(), Base64.DEFAULT) ;
     }
 
-    public static Map<String, Object> jsonStringToMap(String jsonString){
-        HashMap map = null;
+    public static Object jsonStringToPropertyList(String jsonString){
+        if (jsonString.startsWith("nanoRep.FAQ.faqData = ")) {
+            jsonString = jsonString.substring(22);
+        }
+        Object propertyList = null;
         try {
-            JSONObject jsonObject = new JSONObject(jsonString);
-            map = (HashMap) mapFromJson(jsonObject);
+            Object json = new JSONTokener(jsonString).nextValue();
+            if (json instanceof JSONArray) {
+                JSONArray jsonArray = new JSONArray(jsonString);
+                propertyList = toList(jsonArray);
+            } else if (json instanceof JSONObject) {
+                JSONObject jsonObject = new JSONObject(jsonString);
+                propertyList = (HashMap) mapFromJson(jsonObject);
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return map;
+        return propertyList;
     }
     public static Map<String, Object> toMap(JSONObject object) throws JSONException {
         Map<String, Object> map = new HashMap();
@@ -130,11 +141,12 @@ public class NRUtilities {
     }
 
     public static URL getFAQRequest(HashMap<String, String> params) {
-        String api = params.get("api");
-        String link = "https://office.nanorep.com/~" + params.get("account");
+        String api = params.get(ApiNameKey);
+        String link = "https://" + params.get(DomainKey) + "/~" + params.get(AccountNameKey);
+        params.remove(DomainKey);
         URL url = null;
         if (api != null) {
-            link += (api.equals("cnf") ? "/widget/scripts/" + api + ".json" : "/api/faq/v1/" + api + ".js") + "?";
+            link += (api.equals("cnf.json") ? "/widget/scripts/" + api: "/api/faq/v1/" + api) + "?";
             params.remove("api");
             for (String key: params.keySet()) {
                 link += key + "=" + params.get(key) + "&";
@@ -156,7 +168,7 @@ public class NRUtilities {
     public static final String md5(HashMap<String, String> params) {
         final String MD5 = "MD5";
         String api = params.get("api");
-        String link = "https://office.nanorep.com/~" + params.get("account");
+        String link = "https://" + params.get(DomainKey) + "/~" + params.get(AccountNameKey);
         if (api != null) {
             link += (api.equals("cnf") ? "/widget/scripts/" + api + ".json" : "/api/faq/v1/" + api + ".js") + "?";
             params.remove("api");
