@@ -76,6 +76,16 @@ public class NanoRep {
         public void suggustions(NRSuggestions suggestions, NRError error);
     }
 
+    /**
+     *
+     * This constructor configures a NanoRep API wrapper.
+     *
+     * @param context App context
+     * @param domain User domain, where the nanorep data is stored
+     * @param accountName Account Name which you will get from NanoRep service
+     * @param knowledgeBase nanorep knowledge base, which configured on the nanorep account
+     * @param nanoContext Your widget context, HashMap which contains key value parameters for example ("platform", "Android")
+     */
     public NanoRep(Context context, String domain, String accountName, String knowledgeBase, HashMap<String, String> nanoContext) {
         mContext = context;
         mAccountName = accountName;
@@ -90,10 +100,21 @@ public class NanoRep {
         mDomain = "office.nanorep.com";
     }
 
+    /**
+     *
+     * @param referer User custom referrer
+     */
     public void setReferer(String referer) {
         mReferer = referer;
     }
 
+
+    /**
+     * Fetches search results
+     *
+     * @param text The text for search query
+     * @param completion Callback which contains NRSearchResponse object if the search is successful or NRError object if the search fails.
+     */
     public void searchText(final String text, final NRSearchCompletion completion) {
         if (mCachedSearches != null && mCachedSearches.get(text) != null) {
             completion.searchResponse(mCachedSearches.get(text), null);
@@ -122,6 +143,12 @@ public class NanoRep {
         }
     }
 
+    /**
+     * Fetches suggestions for search, helps to speed up the search operation
+     *
+     * @param text The text for suggestion query
+     * @param completion Callback which contains NRSuggestions object if the search is successful or NRError object if it fails.
+     */
     public void suggestionsForText(final String text, final NRSuggestionsCompletion completion) {
         if (mCachedSuggestions != null && mCachedSuggestions.get(text) != null) {
             completion.suggustions(mCachedSuggestions.get(text), null);
@@ -163,6 +190,12 @@ public class NanoRep {
         }
     }
 
+    /**
+     * Updates the likes value of search result.
+     *
+     * @param likeParams Like params object
+     * @param completion Callback contains the like's type and success status
+     */
     public void sendLike(NRSearchLikeParams likeParams, final NRLikeCompletion completion) {
         HashMap<String, String> params = likeParams.getParams();
         params.put(NRUtilities.ApiNameKey, LikeAPI);
@@ -178,33 +211,69 @@ public class NanoRep {
         });
     }
 
+    /**
+     * Changes the context of NanoRep API wrapper
+     *
+     * @param context Your widget context
+     * @param completion Callback which contains boolean for success/fail
+     */
     public void changeContext(HashMap<String, String> context, NRSuccessCompletion completion) {
 
     }
 
+    /**
+     * Fetches list of FAQ according to the params values
+     *
+     * @param params FAQ params object.
+     * @param completion Callback which contains NRFAQDataObject in case of successful response or NRError in case of unsuccessful response.
+     */
     public void faqWithParams(NRFAQParams params, NRFAQCompletion completion) {
         getFAQ().faqWithParams(params, completion);
     }
 
+    /**
+     * Fetches specific answer by the Id value (which you get when fetching FAQ)
+     *
+     * @param answerId Id of the answer
+     * @param completion Callback which contains the answer object in case of successful response and NSError in case of unsuccessful response.
+     */
     public void answerWithId(String answerId, NRFAQAnswerCompletion completion) {
         getFAQ().answerWithId(answerId, completion);
     }
 
+    /**
+     * Updates the likes value of an answer
+     *
+     * @param faqLikeParams FAQ Like params object
+     * @param completion Callback contains the like's type and success status
+     */
     public void faqLike(NRFAQLikeParams faqLikeParams, NRLikeCompletion completion) {
         getFAQ().faqLike(faqLikeParams, completion);
     }
 
+    /**
+     * Fetches the default FAQ of an account (according to the customValue)
+     *
+     * @param completion Callback which contains the NRFAQCnf object in case of successful response and NRError in case of unsuccessful
+     */
     public void fetchDefaultFAQWithCompletion(NRDefaultFAQCompletion completion) {
         getFAQ().fetchDefaultFAQWithCompletion(mKnowledgeBase, completion);
     }
 
 
-
-    public void startVoiceRecognition(Activity activity, final NRSpeechRecognizerCompletion completion) {
-        mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(activity);
+    /**
+     * Starts voice recognition and fetches the text by the completion callback
+     *
+     * @param contex The app context or activity context
+     * @param completion Callback that fetches the recorded text in String.
+     */
+    public void startVoiceRecognition(Context contex, final NRSpeechRecognizerCompletion completion) {
+        if (mSpeechRecognizer == null) {
+            mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(contex);
+        }
         mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, activity.getPackageName());
+        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, contex.getPackageName());
         mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 2000000);
 
         mSpeechRecognizer.setRecognitionListener(new RecognitionListener() {
@@ -255,7 +324,7 @@ public class NanoRep {
                 Log.d("startVoiceRecognition", "onEvent");
             }
         });
-        Handler mainHandler = new Handler(activity.getMainLooper());
+        Handler mainHandler = new Handler(contex.getMainLooper());
 
         Runnable myRunnable = new Runnable() {
             @Override

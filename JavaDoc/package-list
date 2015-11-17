@@ -1,0 +1,6 @@
+NanoRep
+NanoRep.Interfaces
+NanoRep.RequestParams
+NanoRep.ResponseParams
+com.nanorep.nanorepsdk
+com.nanorep.nanorepsdk.Connection

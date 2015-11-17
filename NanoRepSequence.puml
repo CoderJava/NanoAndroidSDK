@@ -1,0 +1,44 @@
+@startuml
+
+participant "NanoRepFAQ" as nrf
+
+title FAQ Requests
+
+== Default CNF ==
+App -> NanoRep: Default Cnf
+NanoRep -> NanoRepFAQ: Default Cnf
+NanoRepFAQ -> NRConnection: cnf request
+'NRConnection --> NanoRepFAQ: cnf response
+Alt faqData = context dependent or faqData is empty
+
+NanoRepFAQ -> NRConnection: list request
+NRConnection --> NanoRepFAQ: Insert the faqData to the cnf Response
+NanoRepFAQ --> NanoRep: Default Cnf
+NanoRep --> App: Default Cnf
+
+else  faqData is null
+NanoRepFAQ --> NanoRep: No FAQ
+NanoRep --> App: No FAQ
+
+end
+
+== Choose Answer from FAQ ==
+App -> NanoRep: User choose and answer
+NanoRep -> NanoRepFAQ: answer with Id
+NanoRepFAQ -> NRConnection: answer.js request
+NRConnection --> NanoRepFAQ: answer response
+NanoRepFAQ --> NanoRep: create answer object
+NanoRep --> App: answer to present
+
+== Like an Answer From FAQ ==
+App -> NanoRep: User like an answer
+NanoRep -> NanoRepFAQ: like
+NanoRepFAQ -> NRConnection: faqAction.gif request
+NRConnection --> NanoRepFAQ: like response
+NanoRepFAQ --> NanoRep: check like success
+NanoRep --> App: like true or false
+
+newpage NanoRep Requests
+
+
+@enduml
