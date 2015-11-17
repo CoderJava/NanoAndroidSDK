@@ -73,4 +73,4 @@ mNanoRep.startVoiceRecognition(getApplicationContext(), new NRSpeechRecognizerCo
 ```
 
 ## For more information you can use our Documentation:
-[NanoRep Documentation](http://htmlpreview.github.com/?https://github.com/nanorepsdk/NanoDemoApp/blob/Version0.2/JavaDoc/html/index.html)
+[NanoRep Documentation](http://htmlpreview.github.io/?https://github.com/nanorepsdk/NanoAndroidSDK/blob/Version0.2/JavaDoc/index.html)
