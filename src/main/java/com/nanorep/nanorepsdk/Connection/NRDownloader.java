@@ -21,6 +21,7 @@ public class NRDownloader extends  AsyncTask <URL, Integer, Object> {
         public void downloadCompleted(NRDownloader downloader, Object data, NRError error);
     }
 
+
     public NRDownloader(NRDownloaderListener listener) {
         super();
         mListener = listener;

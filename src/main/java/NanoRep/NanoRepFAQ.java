@@ -90,6 +90,12 @@ public class NanoRepFAQ {
         });
     }
 
+    /**
+     * Updates the likes value of an answer
+     *
+     * @param faqLikeParams FAQ Like params object
+     * @param completion Callback contains the like's type and success status
+     */
     public void faqLike(final NRFAQLikeParams faqLikeParams, final NRLikeCompletion completion) {
         if (faqLikeParams != null) {
             String likeUrl = "http://" + mDomain + "/~" + mAccountName + "/widget/faqAction.gif?";
@@ -148,6 +154,12 @@ public class NanoRepFAQ {
         });
     }
 
+    /**
+     * Fetch the default configuration for the account
+     *
+     * @param knowledgeBase
+     * @param completion Callback with configuration parameters in case of success or NRError in case of error
+     */
     public void fetchDefaultFAQWithCompletion(String knowledgeBase, final NRDefaultFAQCompletion completion) {
         final HashMap<String, String> params = getDefaultParams();
         params.put(NRUtilities.ApiNameKey, "cnf.json");

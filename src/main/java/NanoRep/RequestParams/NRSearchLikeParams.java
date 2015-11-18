@@ -8,11 +8,16 @@ import java.net.URLEncoder;
  */
 public class NRSearchLikeParams extends NRRequestParams {
     private String mSearchQuery;
-    private int mFeedbackType;
+    private NRLikeType mFeedbackType;
     private String mKeywordSetId;
     private String mKBLanguageCode;
     private String mArticleId;
 
+    /**
+     * Send like for search result
+     *
+     * @param searchQuery The searched text
+     */
     public void setSearchQuery(String searchQuery) {
         String encodedText = null;
         try {
@@ -24,21 +29,40 @@ public class NRSearchLikeParams extends NRRequestParams {
         setValue(mSearchQuery, "text");
     }
 
-    public void setFeedbackType(int feedbackType) {
+    /**
+     * Set the like type
+     *
+     * @param feedbackType can be like or unlike and more, check out our documentation
+     */
+    public void setFeedbackType(NRLikeType feedbackType) {
         mFeedbackType = feedbackType;
-        setValue(Integer.toString(feedbackType), "type");
+        setValue(feedbackType.toString(), "type");
     }
 
+    /**
+     *
+     * @param keywordSetId
+     */
     public void setKeywordSetId(String keywordSetId) {
         mKeywordSetId = keywordSetId;
         setValue(keywordSetId, "ksId");
     }
 
+    /**
+     * Set the language by lang code
+     *
+     * @param KBLanguageCode language code
+     */
     public void setKBLanguageCode(String KBLanguageCode) {
         mKBLanguageCode = KBLanguageCode;
         setValue(KBLanguageCode, "kbLC");
     }
 
+    /**
+     * Set the liked article id
+     *
+     * @param articleId The id which you got when you fetched the search result
+     */
     public void setArticleId(String articleId) {
         mArticleId = articleId;
         setValue(articleId, "articleId");
