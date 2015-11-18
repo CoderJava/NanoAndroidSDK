@@ -15,6 +15,11 @@ public class NRSuggestions {
     private String mQueryAnalysis;
     private ArrayList<String> mAnswers;
 
+    /**
+     * Converts JSON string into NRSuggestions
+     *
+     * @param params HashMap contains the NRSuggestions params
+     */
     public NRSuggestions(HashMap<String, Object> params) {
         mResultsCount = (int)params.get("c");
         mRequestId = (String)params.get("rid");
@@ -23,22 +28,42 @@ public class NRSuggestions {
         mAnswers = (ArrayList<String>)params.get("a");
     }
 
+    /**
+     *
+     * @return value of results count
+     */
     public int getResultsCount() {
         return mResultsCount;
     }
 
+    /**
+     *
+     * @return value of request id
+     */
     public String getRequestId() {
         return mRequestId;
     }
 
+    /**
+     *
+     * @return value of language code
+     */
     public String getLanguageCode() {
         return mLanguageCode;
     }
 
+    /**
+     *
+     * @return value of query analysis
+     */
     public String getQueryAnalysis() {
         return mQueryAnalysis;
     }
 
+    /**
+     *
+     * @return value of answers
+     */
     public ArrayList<String> getAnswers() {
         return mAnswers;
     }

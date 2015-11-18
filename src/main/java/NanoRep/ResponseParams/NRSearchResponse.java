@@ -14,6 +14,11 @@ public class NRSearchResponse {
     private String mDetectedLanguage;
     private ArrayList<HashMap<String, Object>> mAnswerList;
 
+    /**
+     * Converts JSON string into NRSearchResponse
+     *
+     * @param params HashMap contains all of the NRSearchResponse params
+     */
     public NRSearchResponse(HashMap<String, Object> params) {
         mSearchId = (String)params.get("requestId");
         mLangCode = (String)params.get("kbLanguageCode");
@@ -21,18 +26,34 @@ public class NRSearchResponse {
         mAnswerList = (ArrayList<HashMap<String, Object>>)params.get("answers");
     }
 
+    /**
+     *
+     * @return value of search id
+     */
     public String getSearchId() {
         return mSearchId;
     }
 
+    /**
+     *
+     * @return value of langCode
+     */
     public String getLangCode() {
         return mLangCode;
     }
 
+    /**
+     *
+     * @return value of detected language
+     */
     public String getDetectedLanguage() {
         return mDetectedLanguage;
     }
 
+    /**
+     *
+     * @return value of answer list
+     */
     public ArrayList<HashMap<String, Object>> getAnswerList() {
         return mAnswerList;
     }
