@@ -177,13 +177,17 @@ public class NanoRepFAQ {
                     }
                 } else {
                     NRFAQCnf cnf = new NRFAQCnf((HashMap)responseParam);
-                    if (cnf.getFaqData() == null) {
-                        completion.fetchDefaultFAQ(null, NRError.error("com.nanorepfaq", 1002, "faqData empty"));
-                    } else if (cnf.getFaqData() instanceof String || (cnf.getFaqData() instanceof ArrayList && ((ArrayList)cnf.getFaqData()).size() == 0)) {
-                        fetchFAQList((HashMap)responseParam, completion);
+                    if (cnf != null) {
+                        if (cnf.getFaqData() == null) {
+                            completion.fetchDefaultFAQ(null, NRError.error("com.nanorepfaq", 1002, "faqData empty"));
+                        } else if (cnf.getFaqData() instanceof String || (cnf.getFaqData() instanceof ArrayList && ((ArrayList) cnf.getFaqData()).size() == 0)) {
+                            fetchFAQList((HashMap) responseParam, completion);
+                        } else {
+                            completion.fetchDefaultFAQ(new NRFAQCnf((HashMap) responseParam), null);
+                            NRCacheManager.storeAnswerById(mContext, NRUtilities.md5(params), (HashMap) responseParam);
+                        }
                     } else {
-                        completion.fetchDefaultFAQ(new NRFAQCnf((HashMap)responseParam), null);
-                        NRCacheManager.storeAnswerById(mContext, NRUtilities.md5(params), (HashMap)responseParam);
+                        completion.fetchDefaultFAQ(null, NRError.error("com.nanorepfaq", 1002, "cnf empty"));
                     }
                 }
                 mDefaultParams = null;

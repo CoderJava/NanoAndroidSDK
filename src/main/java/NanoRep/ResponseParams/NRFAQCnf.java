@@ -62,6 +62,9 @@ public class NRFAQCnf {
     public Object getFaqData() {
         ArrayList<NRFAQCnfItem> arr = null;
 //        ArrayList<HashMap<String, Object>> data = (ArrayList)mParams.get("faqData");
+        if (mParams == null) {
+            return null;
+        }
         Object data = mParams.get("faqData");
         if (data == null) {
             return null;
