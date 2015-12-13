@@ -13,7 +13,7 @@ public class NRSuggestions {
     private String mRequestId;
     private String mLanguageCode;
     private String mQueryAnalysis;
-    private ArrayList<String> mAnswers;
+    private ArrayList<String> mSuggestions;
 
     /**
      * Converts JSON string into NRSuggestions
@@ -25,7 +25,7 @@ public class NRSuggestions {
         mRequestId = (String)params.get("rid");
         mLanguageCode = (String)params.get("lc");
         mQueryAnalysis = (String)params.get("q");
-        mAnswers = (ArrayList<String>)params.get("a");
+        mSuggestions = (ArrayList<String>)params.get("a");
     }
 
     /**
@@ -64,7 +64,7 @@ public class NRSuggestions {
      *
      * @return value of answers
      */
-    public ArrayList<String> getAnswers() {
-        return mAnswers;
+    public ArrayList<String> getSuggestions() {
+        return mSuggestions;
     }
 }
