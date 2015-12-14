@@ -32,7 +32,7 @@ public class NRFAQGroupItem {
      *
      * @return ArrayList of NRFAQAnswerItem
      */
-    public ArrayList<NRFAQAnswerItem> getData() {
+    public ArrayList<NRFAQAnswerItem> getAnswers() {
         ArrayList<NRFAQAnswerItem> arr = null;
         ArrayList<HashMap<String, Object>> data = (ArrayList)mParams.get("data");
         if (mData == null && data.size() > 0) {
