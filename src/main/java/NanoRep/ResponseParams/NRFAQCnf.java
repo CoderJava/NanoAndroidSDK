@@ -7,8 +7,9 @@ import java.util.HashMap;
  * Created by nissopa on 9/13/15.
  */
 public class NRFAQCnf {
-    private Object mFaqData;
+    private NRFAQData mFaqData;
     private HashMap<String, Object> mParams;
+    private boolean mIsContextDependent = false;
 
     /**
      * Converts the response JSON into NRFAQCnf object
@@ -17,6 +18,12 @@ public class NRFAQCnf {
      */
     public NRFAQCnf(HashMap<String, Object> params) {
         mParams = params;
+        if (params != null) {
+            Object faq = mParams.get("faqData");
+            if (faq != null && faq instanceof String) {
+                mIsContextDependent = true;
+            }
+        }
     }
 
     /**
@@ -59,25 +66,50 @@ public class NRFAQCnf {
      *
      * @return ArrayList of NRFAQCnfItem
      */
-    public Object getFaqData() {
-        ArrayList<NRFAQCnfItem> arr = null;
-//        ArrayList<HashMap<String, Object>> data = (ArrayList)mParams.get("faqData");
-        if (mParams == null) {
+//    public Object getFaqData() {
+//        ArrayList<NRFAQCnfItem> arr = null;
+////        ArrayList<HashMap<String, Object>> data = (ArrayList)mParams.get("faqData");
+//        if (mParams == null) {
+//            return null;
+//        }
+//        Object data = mParams.get("faqData");
+//        if (data == null) {
+//            return null;
+//        }
+//        if (data instanceof ArrayList) {
+//            arr = new ArrayList<NRFAQCnfItem>();
+//            for (HashMap<String, Object> map: (ArrayList<HashMap<String, Object>>)data) {
+//                arr.add(new NRFAQCnfItem(map));
+//            }
+//            mFaqData = new ArrayList<NRFAQCnfItem>(arr);
+//            arr = null;
+//            return mFaqData;
+//        }
+//        return data;
+//    }
+    public boolean getIsContextDependent() {
+        return mIsContextDependent;
+    }
+
+    public void setFaqData(HashMap<String, Object> faqList) {
+        mParams.put("faqData", faqList);
+        mIsContextDependent = false;
+    }
+
+    public NRFAQData getFaqData() {
+        if (mIsContextDependent) {
             return null;
         }
-        Object data = mParams.get("faqData");
-        if (data == null) {
-            return null;
-        }
-        if (data instanceof ArrayList) {
-            arr = new ArrayList<NRFAQCnfItem>();
-            for (HashMap<String, Object> map: (ArrayList<HashMap<String, Object>>)data) {
-                arr.add(new NRFAQCnfItem(map));
+        if (mFaqData == null) {
+            if (mParams == null) {
+                return null;
             }
-            mFaqData = new ArrayList<NRFAQCnfItem>(arr);
-            arr = null;
-            return mFaqData;
+            ArrayList faq = (ArrayList)mParams.get("faqData");
+            if (faq == null || faq.get(0) == null) {
+                return null;
+            }
+            mFaqData = new NRFAQData((HashMap)faq.get(0));
         }
-        return data;
+        return mFaqData;
     }
 }
