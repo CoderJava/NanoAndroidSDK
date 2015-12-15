@@ -53,7 +53,11 @@ public class NRUtilities {
             _context += key + ":" + context.get(key) + ",";
         }
         _context = _context.substring(0, _context.length() - 1);
-        return Base64.encodeToString(_context.getBytes(), Base64.DEFAULT) ;
+        return _context;
+    }
+
+    public static String wrappedContextBase64(HashMap<String, String > context) {
+        return Base64.encodeToString(wrappedContext(context).getBytes(), Base64.DEFAULT) ;
     }
 
     public static Object jsonStringToPropertyList(String jsonString){

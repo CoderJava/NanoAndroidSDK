@@ -360,7 +360,7 @@ public class NanoRep {
 
     public NanoRepFAQ getFAQ() {
         if (mFAQ == null) {
-            mFAQ = new NanoRepFAQ(mContext, mDomain, mAccountName, NRUtilities.wrappedContext(mNanoContext));
+            mFAQ = new NanoRepFAQ(mContext, mDomain, mAccountName, NRUtilities.wrappedContextBase64(mNanoContext));
             mFAQ.setReferer(mReferer);
         }
         return mFAQ;
