@@ -105,7 +105,10 @@ public class NRFAQCnf {
                 return null;
             }
             ArrayList faq = (ArrayList)mParams.get("faqData");
-            if (faq == null || faq.get(0) == null) {
+            if (faq == null) {
+                return null;
+            }
+            if (faq.get(0) == null) {
                 return null;
             }
             mFaqData = new NRFAQData((HashMap)faq.get(0));
