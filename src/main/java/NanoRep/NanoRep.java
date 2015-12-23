@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
@@ -28,6 +29,7 @@ import NanoRep.Interfaces.NRSuccessCompletion;
 import NanoRep.RequestParams.NRFAQLikeParams;
 import NanoRep.RequestParams.NRFAQParams;
 import NanoRep.RequestParams.NRSearchLikeParams;
+import NanoRep.ResponseParams.NRFAQCnf;
 import NanoRep.ResponseParams.NRSearchResponse;
 import NanoRep.ResponseParams.NRSuggestions;
 
@@ -49,6 +51,10 @@ public class NanoRep {
     private Context mContext;
     private String mDomain;
     private String mKnowledgeBase;
+
+    private static Context sContext;
+    private static String sAccountName;
+    private static String sDomain;
 
 
     // APIs
@@ -82,22 +88,30 @@ public class NanoRep {
      *
      * @param context App context
      * @param domain User domain, where the nanorep data is stored
-     * @param accountName Account Name which you will get from NanoRep service
-     * @param knowledgeBase nanorep knowledge base, which configured on the nanorep account
-     * @param nanoContext Your widget context, HashMap which contains key value parameters for example ("platform", "Android")
      */
-    public NanoRep(Context context, String domain, String accountName, String knowledgeBase, HashMap<String, String> nanoContext) {
-        mContext = context;
-        mAccountName = accountName;
-        mNanoContext = nanoContext;
-        mDomain = domain;
-        mKnowledgeBase = knowledgeBase;
+    public static  void initializeNanorep(Context context, String account, String domain) {
+        sContext = context;
+        sAccountName = account;
+        sDomain = domain;
+        NanoRep defaultCNF = new NanoRep(null, null);
+        defaultCNF.fetchDefaultFAQWithCompletion(new NRDefaultFAQCompletion() {
+            @Override
+            public void fetchDefaultFAQ(NRFAQCnf cnf, NRError error) {
+
+            }
+        });
     }
 
-    public NanoRep(Context context, String accountName) {
-        mContext = context;
-        mAccountName = accountName;
-        mDomain = "office.nanorep.com";
+    public NanoRep(String knowledgeBase, HashMap<String, String> nanoContext) {
+        if (android.os.Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
+        mContext = sContext;
+        mAccountName = sAccountName;
+        mNanoContext = nanoContext;
+        mDomain = sDomain;
+        mKnowledgeBase = knowledgeBase;
     }
 
     /**
@@ -264,16 +278,15 @@ public class NanoRep {
     /**
      * Starts voice recognition and fetches the text by the completion callback
      *
-     * @param contex The app context or activity context
      * @param completion Callback that fetches the recorded text in String.
      */
-    public void startVoiceRecognition(Context contex, final NRSpeechRecognizerCompletion completion) {
+    public void startVoiceRecognition(final NRSpeechRecognizerCompletion completion) {
         if (mSpeechRecognizer == null) {
-            mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(contex);
+            mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(sContext);
         }
         mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, contex.getPackageName());
+        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, sContext.getPackageName());
         mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 2000000);
 
         mSpeechRecognizer.setRecognitionListener(new RecognitionListener() {
@@ -324,7 +337,7 @@ public class NanoRep {
                 Log.d("startVoiceRecognition", "onEvent");
             }
         });
-        Handler mainHandler = new Handler(contex.getMainLooper());
+        Handler mainHandler = new Handler();
 
         Runnable myRunnable = new Runnable() {
             @Override

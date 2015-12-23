@@ -30,26 +30,6 @@ public class NRDownloader extends  AsyncTask <URL, Integer, Object> {
     @Override
     protected Object doInBackground(URL... urls) {
         URL url = urls[0];
-        return getFileAtUrl(url);
-    }
-
-    @Override
-    protected void onProgressUpdate(Integer... values) {
-//        listener.partialDownload(values[0]);
-    }
-
-    @Override
-    protected void onPostExecute(Object bytes){
-        if (bytes instanceof NRError) {
-            mListener.downloadCompleted(this, null, (NRError)bytes);
-        } else if (((byte[])bytes).length > 0) {
-            mListener.downloadCompleted(this, bytes, null);
-        } else {
-            mListener.downloadCompleted(this, null, NRError.error("Parsed Response", 1001, "Empty response"));
-        }
-    }
-
-    private Object getFileAtUrl(URL url){
         byte[] data = null;
         try{
             InputStream inputStream = new BufferedInputStream(url.openStream());
@@ -70,17 +50,20 @@ public class NRDownloader extends  AsyncTask <URL, Integer, Object> {
         }
         return data;
     }
-//    private Object getFileAtUrl(URL url) {
-//        String result = "";
-//        try {
-//            BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8));
-//            String line = null;
-//            while ((line = in.readLine())  != null) {
-//                result += line;
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        return result;
-//    }
+
+    @Override
+    protected void onProgressUpdate(Integer... values) {
+//        listener.partialDownload(values[0]);
+    }
+
+    @Override
+    protected void onPostExecute(Object bytes){
+        if (bytes instanceof NRError) {
+            mListener.downloadCompleted(this, null, (NRError)bytes);
+        } else if (((byte[])bytes).length > 0) {
+            mListener.downloadCompleted(this, bytes, null);
+        } else {
+            mListener.downloadCompleted(this, null, NRError.error("Parsed Response", 1001, "Empty response"));
+        }
+    }
 }

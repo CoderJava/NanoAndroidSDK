@@ -35,6 +35,12 @@ public class NanoRepFAQ {
     private HashMap<String, String> mDefaultParams;
     private String mNanoContext;
 
+    private static NRFAQCnf sCNF;
+
+    public static void setCNF(NRFAQCnf cnf) {
+        sCNF = cnf;
+    }
+
     public NanoRepFAQ(Context context, String domain,  String accountName, String nanoContext) {
         mContext = context;
         mAccountName = accountName;
@@ -145,43 +151,49 @@ public class NanoRepFAQ {
      * @param completion Callback with configuration parameters in case of success or NRError in case of error
      */
     public void fetchDefaultFAQWithCompletion(String knowledgeBase, final NRDefaultFAQCompletion completion) {
-        final HashMap<String, String> params = getDefaultParams();
-        params.put(NRUtilities.ApiNameKey, "cnf.json");
-        params.put("kb", knowledgeBase);
-//        final String id = NRUtilities.md5(NRUtilities.getFAQRequest(params));
-        NRConnection.connectionWithRequest(NRUtilities.getFAQRequest(params), new NRConnection.NRConnectionListener() {
-            @Override
-            public void response(Object responseParam, NRError error) {
-                if (error != null) {
-                    HashMap<String, Object> cachedResponse = NRCacheManager.getAnswerById(mContext, NRUtilities.md5(params));
-                    if (cachedResponse != null) {
-                        completion.fetchDefaultFAQ(new NRFAQCnf(cachedResponse), null);
-                    } else {
-                        completion.fetchDefaultFAQ(null, error);
-                    }
-                } else {
-                    final NRFAQCnf cnf = new NRFAQCnf((HashMap)responseParam);
-                    if (cnf.getIsContextDependent()) {
-                        fetchFaqList(new NRConnection.NRConnectionListener() {
-                            @Override
-                            public void response(Object responseParam, NRError error) {
-                                if (error != null) {
-                                    completion.fetchDefaultFAQ(null, error);
-                                } else if (responseParam != null) {
-                                    cnf.setFaqData((HashMap)responseParam);
-                                    completion.fetchDefaultFAQ(cnf, null);
-                                } else {
-                                    completion.fetchDefaultFAQ(null, NRError.error("com.nanorepfaq", 1002, "faqData empty"));
-                                }
-                            }
-                        });
-                    } else {
-                        completion.fetchDefaultFAQ(new NRFAQCnf((HashMap) responseParam), null);
-                        NRCacheManager.storeAnswerById(mContext, NRUtilities.md5(params), (HashMap) responseParam);
-                    }
-                }
-                mDefaultParams = null;
+        if (sCNF != null) {
+            completion.fetchDefaultFAQ(sCNF, null);
+        } else {
+            final HashMap<String, String> params = getDefaultParams();
+            params.put(NRUtilities.ApiNameKey, "cnf.json");
+            if (knowledgeBase != null) {
+                params.put("kb", knowledgeBase);
             }
-        });
+//        final String id = NRUtilities.md5(NRUtilities.getFAQRequest(params));
+            NRConnection.connectionWithRequest(NRUtilities.getFAQRequest(params), new NRConnection.NRConnectionListener() {
+                @Override
+                public void response(Object responseParam, NRError error) {
+                    if (error != null) {
+                        HashMap<String, Object> cachedResponse = NRCacheManager.getAnswerById(mContext, NRUtilities.md5(params));
+                        if (cachedResponse != null) {
+                            completion.fetchDefaultFAQ(new NRFAQCnf(cachedResponse), null);
+                        } else {
+                            completion.fetchDefaultFAQ(null, error);
+                        }
+                    } else {
+                        final NRFAQCnf cnf = new NRFAQCnf((HashMap) responseParam);
+                        if (cnf.getIsContextDependent()) {
+                            fetchFaqList(new NRConnection.NRConnectionListener() {
+                                @Override
+                                public void response(Object responseParam, NRError error) {
+                                    if (error != null) {
+                                        completion.fetchDefaultFAQ(null, error);
+                                    } else if (responseParam != null) {
+                                        cnf.setFaqData((HashMap) responseParam);
+                                        completion.fetchDefaultFAQ(cnf, null);
+                                    } else {
+                                        completion.fetchDefaultFAQ(null, NRError.error("com.nanorepfaq", 1002, "faqData empty"));
+                                    }
+                                }
+                            });
+                        } else {
+                            completion.fetchDefaultFAQ(new NRFAQCnf((HashMap) responseParam), null);
+                            NRCacheManager.storeAnswerById(mContext, NRUtilities.md5(params), (HashMap) responseParam);
+                        }
+                    }
+                    mDefaultParams = null;
+                }
+            });
+        }
     }
 }
