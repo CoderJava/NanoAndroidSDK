@@ -51,7 +51,10 @@ public class NanoRep {
     private Context mContext;
     private String mDomain;
     private String mKnowledgeBase;
+    private static NRDefaultFAQCompletion sCNFCompletion;
 
+    private static boolean fetching = false;
+    private static NanoRep initSession;
     private static Context sContext;
     private static String sAccountName;
     private static String sDomain;
@@ -93,11 +96,14 @@ public class NanoRep {
         sContext = context;
         sAccountName = account;
         sDomain = domain;
-        NanoRep defaultCNF = new NanoRep(null, null);
-        defaultCNF.fetchDefaultFAQWithCompletion(new NRDefaultFAQCompletion() {
+        initSession = new NanoRep(null, null);
+        initSession.fetchDefaultFAQWithCompletion(new NRDefaultFAQCompletion() {
             @Override
             public void fetchDefaultFAQ(NRFAQCnf cnf, NRError error) {
-
+                if (sCNFCompletion != null) {
+                    sCNFCompletion.fetchDefaultFAQ(cnf, error);
+                    sCNFCompletion = null;
+                }
             }
         });
     }
@@ -287,7 +293,11 @@ public class NanoRep {
      * @param completion Callback which contains the NRFAQCnf object in case of successful response and NRError in case of unsuccessful
      */
     public void fetchDefaultFAQWithCompletion(NRDefaultFAQCompletion completion) {
-        getFAQ().fetchDefaultFAQWithCompletion(mKnowledgeBase, completion);
+        if (initSession.equals(this)) {
+            getFAQ().fetchDefaultFAQWithCompletion(mKnowledgeBase, completion);
+        } else {
+            sCNFCompletion = completion;
+        }
     }
 
 

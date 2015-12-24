@@ -112,7 +112,7 @@ public class NRFAQCnf {
             if (faq.get(0) == null) {
                 return null;
             }
-            mFaqData = new NRFAQData((HashMap)faq.get(0));
+            mFaqData = new NRFAQData(faq);
         }
         return mFaqData;
     }

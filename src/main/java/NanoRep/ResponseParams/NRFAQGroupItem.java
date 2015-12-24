@@ -2,6 +2,7 @@ package NanoRep.ResponseParams;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 
 /**
  * Created by nissopa on 9/13/15.
@@ -19,12 +20,30 @@ public class NRFAQGroupItem {
         mParams = params;
     }
 
+    private HashMap getFirstGroup() {
+        if (mParams.get("data") != null && ((ArrayList)mParams.get("data")).get(0) != null) {
+            return (HashMap)((ArrayList)mParams.get("data")).get(0);
+        }
+        return null;
+    }
+
     /**
      *
      * @return value of id
      */
-    public String getGroupId() {
-        return (String)mParams.get("id");
+    public Integer getGroupId() {
+        if (getFirstGroup() != null) {
+            return (Integer)getFirstGroup().get("id");
+        }
+        return null;
+    }
+
+    public String getTitle() {
+        return (String)mParams.get("title");
+    }
+
+    public Integer getBehavior() {
+        return (Integer)mParams.get("behavior");
     }
 
     /**
@@ -33,8 +52,11 @@ public class NRFAQGroupItem {
      * @return ArrayList of NRFAQAnswerItem
      */
     public ArrayList<NRFAQAnswerItem> getAnswers() {
+        if (getFirstGroup() == null) {
+            return null;
+        }
         ArrayList<NRFAQAnswerItem> arr = null;
-        ArrayList<HashMap<String, Object>> data = (ArrayList)mParams.get("data");
+        ArrayList<HashMap<String, Object>> data = (ArrayList)getFirstGroup().get("data");
         if (mData == null && data.size() > 0) {
             arr = new ArrayList<NRFAQAnswerItem>();
             for (HashMap<String, Object> map: data) {
