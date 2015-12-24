@@ -84,9 +84,9 @@ public class NanoRep {
 
     /**
      *
-     * This constructor configures a NanoRep API wrapper.
+     * This method will initiate the nanorep session
      *
-     * @param context App context
+     * @param context App context that you can get from the Application class
      * @param domain User domain, where the nanorep data is stored
      */
     public static  void initializeNanorep(Context context, String account, String domain) {
@@ -102,6 +102,12 @@ public class NanoRep {
         });
     }
 
+    /**
+     * This constructor configures a NanoRep API wrapper.
+     *
+     * @param knowledgeBase The knowledge base name.
+     * @param nanoContext If you want to use a specific context you can set it by key-value.
+     */
     public NanoRep(String knowledgeBase, HashMap<String, String> nanoContext) {
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
