@@ -6,7 +6,7 @@ Quick Start Guide
 ======
 
 
-1. git clone https://github.com/nanorepsdk/NanoAndroidSDK/tree/develop to the same folder of your app.
+1. git clone https://github.com/nanorepsdk/NanoAndroidSDK to the same folder of your app.
 
 2. Add reference to NanoAndroidSDK module from your project:
 
