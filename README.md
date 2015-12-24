@@ -6,7 +6,7 @@ Quick Start Guide
 ======
 
 
-1. git clone https://github.com/nanorepsdk/nano_iOS_SDK/tree/version1.0 to the same folder of your app.
+1. git clone https://github.com/nanorepsdk/NanoAndroidSDK/tree/develop to the same folder of your app.
 
 2. Add reference to NanoAndroidSDK module from your project:
 
@@ -81,7 +81,7 @@ mNanoRep.suggestionsForText(text, new NanoRep.NRSuggestionsCompletion() {
             @Override
             public void suggustions(NRSuggestions suggestions, NRError error) {
                 if (suggestions != null) {
-                    mSuggestions = suggestions.getAnswers();
+                    mSuggestions = suggestions.getSuggestions();
                     // present the answers, or use the searchText api
                 }
             }
