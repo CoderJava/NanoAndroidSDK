@@ -179,7 +179,7 @@ public class NanoRepFAQ {
                                     if (error != null) {
                                         completion.fetchDefaultFAQ(null, error);
                                     } else if (responseParam != null) {
-                                        cnf.setFaqData((HashMap) responseParam);
+                                        cnf.setFaqData((ArrayList) responseParam);
                                         completion.fetchDefaultFAQ(cnf, null);
                                     } else {
                                         completion.fetchDefaultFAQ(null, NRError.error("com.nanorepfaq", 1002, "faqData empty"));

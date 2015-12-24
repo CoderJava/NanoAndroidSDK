@@ -202,8 +202,18 @@ public class NanoRep {
                             }
                             ((HashMap)responseParam).put("a", arr);
                             NanoRep.this.getCachedSuggestions().put(text, new NRSuggestions((HashMap)responseParam));
+                            completion.suggustions(NanoRep.this.mCachedSuggestions.get(text), null);
+                        } else {
+                            completion.suggustions(null, NRError.error("NanoRep", 1002, "No suggestions"));
                         }
-                        completion.suggustions(NanoRep.this.mCachedSuggestions.get(text), null);
+
+                    } else if (error != null) {
+                        NRSuggestions storedSuggestions = getCachedSuggestions().get(text);
+                        if (storedSuggestions == null) {
+                            completion.suggustions(null, NRError.error("NanoRep", 1003, "No suggestions in cache"));
+                        } else {
+                            completion.suggustions(storedSuggestions, null);
+                        }
                     }
                 }
             });

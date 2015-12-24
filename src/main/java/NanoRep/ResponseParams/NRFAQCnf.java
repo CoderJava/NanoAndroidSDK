@@ -2,6 +2,7 @@ package NanoRep.ResponseParams;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * Created by nissopa on 9/13/15.
@@ -91,7 +92,7 @@ public class NRFAQCnf {
         return mIsContextDependent;
     }
 
-    public void setFaqData(HashMap<String, Object> faqList) {
+    public void setFaqData(ArrayList<HashMap<String, Object>> faqList) {
         mParams.put("faqData", faqList);
         mIsContextDependent = false;
     }
