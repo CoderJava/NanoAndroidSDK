@@ -14,8 +14,7 @@ public class NRSearchResponse {
     private String mSearchId;
     private String mLangCode;
     private String mDetectedLanguage;
-    private ArrayList<HashMap<String, Object>> mAnswerList;
-    private ArrayList<NRChanneling> mChanneling;
+    private ArrayList<NRAnswer> mAnswerList;
 
     /**
      * Converts JSON string into NRSearchResponse
@@ -27,7 +26,6 @@ public class NRSearchResponse {
         mSearchId = (String)params.get("requestId");
         mLangCode = (String)params.get("kbLanguageCode");
         mDetectedLanguage = (String)params.get("detectedLanguage");
-        mAnswerList = (ArrayList<HashMap<String, Object>>)params.get("answers");
     }
 
     /**
@@ -58,22 +56,18 @@ public class NRSearchResponse {
      *
      * @return value of answer list
      */
-    public ArrayList<HashMap<String, Object>> getAnswerList() {
-        return mAnswerList;
-    }
-
-    public ArrayList<NRChanneling> getChanneling() {
-        if (mChanneling == null) {
-            ArrayList<HashMap<String, Object>> channeling = (ArrayList)mParams.get("rechanneling");
-            if (channeling != null && channeling.size() > 0) {
-                mChanneling = new ArrayList<>();
+    public ArrayList<NRAnswer> getAnswerList() {
+        if (mAnswerList == null) {
+            ArrayList<HashMap<String, Object>> answers = (ArrayList)mParams.get("answers");
+            if (answers != null && answers.size() > 0) {
+                mAnswerList = new ArrayList<>();
+                for (HashMap<String, Object> answer: answers) {
+                    mAnswerList.add(new NRAnswer(answer));
+                }
             } else {
                 return null;
             }
-            for (HashMap<String, Object> channel: channeling) {
-                mChanneling.add(NRChanneling.channelForParams(channel));
-            }
         }
-        return mChanneling;
+        return mAnswerList;
     }
 }

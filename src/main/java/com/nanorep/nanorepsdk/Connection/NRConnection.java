@@ -17,7 +17,7 @@ public class NRConnection {
 
     static private ArrayList<NRDownloader> mConnections;
     public interface NRConnectionListener {
-        public void response(Object responseParam, NRError error);
+        void response(Object responseParam, NRError error);
     }
 
     public static void connectionWithRequest(URL url, final NRConnectionListener listener) {

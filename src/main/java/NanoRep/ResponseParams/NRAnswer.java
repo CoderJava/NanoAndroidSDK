@@ -4,18 +4,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.SimpleTimeZone;
 
+import NanoRep.Chnneling.NRChanneling;
 import NanoRep.NanoRep;
 
 /**
  * Created by nissopa on 9/12/15.
  */
 public class NRAnswer {
+    private HashMap<String, ?> mParams;
     private String mArticleId;
     private String mKeywordsetId;
     private int mLikes;
     private String mTitle;
     private String mSummary;
     private ArrayList<String> mAttachments;
+    private ArrayList<NRChanneling> mChanneling;
 
     /**
      * Converts JSON string to NRAnswer object
@@ -23,12 +26,13 @@ public class NRAnswer {
      * @param params HashMap generated from json string
      */
     public NRAnswer(HashMap<String, Object> params) {
+        mParams = params;
         mArticleId = (String)params.get("id");
         mKeywordsetId = (String)params.get("keywordsetId");
         mLikes = (int)params.get("likes");
         mTitle = (String)params.get("title");
         mSummary = (String)params.get("summary");
-        mAttachments = (ArrayList<String>)params.get("attachments");
+        mAttachments = (ArrayList)params.get("attachments");
     }
 
     /**
@@ -83,4 +87,20 @@ public class NRAnswer {
     public ArrayList<String> getAttachments() {
         return mAttachments;
     }
+
+    public ArrayList<NRChanneling> getChanneling() {
+        if (mChanneling == null) {
+            ArrayList<HashMap<String, ?>> channels = (ArrayList)mParams.get("rechanneling");
+            if (channels != null && channels.size() > 0) {
+                mChanneling = new ArrayList<>();
+                for (HashMap<String, ?> channel : channels) {
+                    mChanneling.add(new NRChanneling(channel));
+                }
+            } else {
+                return null;
+            }
+        }
+        return mChanneling;
+    }
+
 }

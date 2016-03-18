@@ -18,7 +18,7 @@ public class NRChanneling {
         ChatForm
     }
 
-    public NRChanneling(HashMap <String, Object> params) {
+    public NRChanneling(HashMap <String, ?> params) {
         buttonText = (String)params.get("buttonText");
         channelDescription = (String)params.get("description");
     }

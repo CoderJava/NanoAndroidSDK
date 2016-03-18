@@ -18,7 +18,7 @@ import java.nio.charset.StandardCharsets;
 public class NRDownloader extends  AsyncTask <URL, Integer, Object> {
     private NRDownloaderListener mListener;
     public interface NRDownloaderListener {
-        public void downloadCompleted(NRDownloader downloader, Object data, NRError error);
+        void downloadCompleted(NRDownloader downloader, Object data, NRError error);
     }
 
 
