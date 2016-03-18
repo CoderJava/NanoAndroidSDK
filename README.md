@@ -99,6 +99,20 @@ mNanorep.searchText("some answer from suggestions above", new NanoRep.NRSearchCo
             });
 ```
 
+#####Channeling:
+NRSearchResonse includes AnswerList and each answer includes channeling:
+
+```
+ArrayList<NRChanneling> channeling = response.getAnswerList().get(0).getChanneling();
+```
+
+You can present the channel by the parameters which the NRChannel subclass contains:
+
+1. NRChannelingChatForm
+2. NRChannelingContactForm
+3. NRChannelingCustomScript
+4. 
+
 
 ###Speech recognizer 
 
