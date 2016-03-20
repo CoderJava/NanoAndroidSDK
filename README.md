@@ -103,7 +103,31 @@ mNanorep.searchText("some answer from suggestions above", new NanoRep.NRSearchCo
 NRSearchResonse includes AnswerList and each answer includes channeling:
 
 ```
-ArrayList<NRChanneling> channeling = response.getAnswerList().get(0).getChanneling();
+mNanoRep.searchText("some text", new NanoRep.NRSearchCompletion() {
+                @Override
+                public void searchResponse(NRSearchResponse response, NRError error) {
+                    ArrayList<NRChanneling> channels = 					 response.getAnswerList().get(0).getChanneling();
+                    for (NRChanneling channel: channels) {
+                        switch (channel.getType()) {
+                            case PhoneNumber:
+                                // use channel as NRChannelingPhoneNumber
+                                break;
+                            case OpenCustomURL:
+                                // use channel as NRChannelingOpenCustomURL
+                                break;
+                            case ChatForm:
+                                // use channel as NRChannelingChatForm
+                                break;
+                            case ContactForm:
+                                // use channel as NRChannelingContactForm
+                                break;
+                            case CustomScript:
+                                // use channel as NRChannelingCustomScript
+                                break;
+                        }
+                    }
+                }
+            });
 ```
 
 You can present the channel by the parameters which the NRChannel subclass contains:
@@ -111,7 +135,8 @@ You can present the channel by the parameters which the NRChannel subclass conta
 1. NRChannelingChatForm
 2. NRChannelingContactForm
 3. NRChannelingCustomScript
-4. 
+4. NRChannelingOpenCustomURL
+5. NRChannelingPhoneNumber
 
 
 ###Speech recognizer 
