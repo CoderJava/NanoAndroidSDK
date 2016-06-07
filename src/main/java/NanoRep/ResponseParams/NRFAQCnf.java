@@ -36,6 +36,10 @@ public class NRFAQCnf {
         return (String)mParams.get("id");
     }
 
+    public String getTitle() {
+        return (String)mParams.get("titleNormalText");
+    }
+
     /**
      * Fetches the keyboard id
      *

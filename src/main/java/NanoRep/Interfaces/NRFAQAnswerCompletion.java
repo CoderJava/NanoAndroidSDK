@@ -8,5 +8,5 @@ import NanoRep.ResponseParams.NRFAQAnswer;
  * Created by nissopa on 9/14/15.
  */
 public interface NRFAQAnswerCompletion {
-    public void fetchAnswer(NRFAQAnswer answer, NRError error);
+    void fetchAnswer(NRFAQAnswer answer, NRError error);
 }

@@ -1,13 +1,17 @@
 package NanoRep.ResponseParams;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+
+import NanoRep.Chnneling.NRChanneling;
+import NanoRep.Interfaces.NRQueryResult;
 
 /**
  * Created by nissopa on 9/13/15.
  */
-public class NRFAQAnswerItem {
+public class NRFAQAnswerItem implements NRQueryResult {
     private HashMap<String, Object> mParams;
-
+    private String mBody;
     /**
      * Converts JSON string to NRFAQAnswerItem object
      *
@@ -63,5 +67,30 @@ public class NRFAQAnswerItem {
      */
     public float getPercent() {
         return Float.parseFloat((String)mParams.get("percent"));
+    }
+
+    @Override
+    public String getId() {
+        return getObjectId();
+    }
+
+    @Override
+    public String getTitle() {
+        return getLabel();
+    }
+
+    @Override
+    public void setBody(String body) {
+        mBody = body;
+    }
+
+    @Override
+    public String getBody() {
+        return mBody;
+    }
+
+    @Override
+    public ArrayList<NRChanneling> getChanneling() {
+        return null;
     }
 }

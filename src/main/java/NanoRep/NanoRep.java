@@ -97,15 +97,7 @@ public class NanoRep {
         sAccountName = account;
         sDomain = domain;
         initSession = new NanoRep(null, null);
-        initSession.fetchDefaultFAQWithCompletion(new NRDefaultFAQCompletion() {
-            @Override
-            public void fetchDefaultFAQ(NRFAQCnf cnf, NRError error) {
-                if (sCNFCompletion != null) {
-                    sCNFCompletion.fetchDefaultFAQ(cnf, error);
-                    sCNFCompletion = null;
-                }
-            }
-        });
+        initSession.fetchDefaultFAQWithCompletion(null);
     }
 
     /**
@@ -293,11 +285,13 @@ public class NanoRep {
      * @param completion Callback which contains the NRFAQCnf object in case of successful response and NRError in case of unsuccessful
      */
     public void fetchDefaultFAQWithCompletion(NRDefaultFAQCompletion completion) {
-        if (initSession.equals(this)) {
-            getFAQ().fetchDefaultFAQWithCompletion(mKnowledgeBase, completion);
-        } else {
-            sCNFCompletion = completion;
-        }
+        getFAQ().fetchDefaultFAQWithCompletion(mKnowledgeBase, completion);
+//        if (initSession.equals(this)) {
+//            getFAQ().fetchDefaultFAQWithCompletion(mKnowledgeBase, completion);
+//        } else {
+////            sCNFCompletion = completion;
+//            getFAQ().fetchDefaultFAQWithCompletion(mKnowledgeBase, completion);
+//        }
     }
 
 

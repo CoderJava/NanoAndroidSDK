@@ -5,12 +5,13 @@ import java.util.HashMap;
 import java.util.SimpleTimeZone;
 
 import NanoRep.Chnneling.NRChanneling;
+import NanoRep.Interfaces.NRQueryResult;
 import NanoRep.NanoRep;
 
 /**
  * Created by nissopa on 9/12/15.
  */
-public class NRAnswer {
+public class NRAnswer implements NRQueryResult{
     private HashMap<String, ?> mParams;
     private String mArticleId;
     private String mKeywordsetId;
@@ -62,6 +63,11 @@ public class NRAnswer {
         return mLikes;
     }
 
+    @Override
+    public String getId() {
+        return getArticleId();
+    }
+
     /**
      * Fetches Title of answer
      *
@@ -69,6 +75,16 @@ public class NRAnswer {
      */
     public String getTitle() {
         return mTitle;
+    }
+
+    @Override
+    public void setBody(String body) {
+
+    }
+
+    @Override
+    public String getBody() {
+        return getSummary();
     }
 
     /**

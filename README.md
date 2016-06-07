@@ -13,10 +13,10 @@ Quick Start Guide
 
 #####Select _`settings.gradle`_ and add:
 
-```
+~~~ 
 include ':NanoAndroidSDK'
 project(':NanoAndroidSDK').projectDir=new File('../NanoAndroidSDK')
-```
+~~~
 
 #####Select _`build.gradle(Module: app)`_ and add:
 ```

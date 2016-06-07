@@ -176,18 +176,24 @@ public class NanoRepFAQ {
                             fetchFaqList(new NRConnection.NRConnectionListener() {
                                 @Override
                                 public void response(Object responseParam, NRError error) {
-                                    if (error != null) {
-                                        completion.fetchDefaultFAQ(null, error);
-                                    } else if (responseParam != null) {
+                                    if (responseParam != null) {
                                         cnf.setFaqData((ArrayList) responseParam);
-                                        completion.fetchDefaultFAQ(cnf, null);
-                                    } else {
-                                        completion.fetchDefaultFAQ(null, NRError.error("com.nanorepfaq", 1002, "faqData empty"));
+                                    }
+                                    if (completion != null) {
+                                        if (error != null) {
+                                            completion.fetchDefaultFAQ(null, error);
+                                        } else if (responseParam != null) {
+                                            completion.fetchDefaultFAQ(cnf, null);
+                                        } else {
+                                            completion.fetchDefaultFAQ(null, NRError.error("com.nanorepfaq", 1002, "faqData empty"));
+                                        }
                                     }
                                 }
                             });
                         } else {
-                            completion.fetchDefaultFAQ(new NRFAQCnf((HashMap) responseParam), null);
+                            if (completion != null) {
+                                completion.fetchDefaultFAQ(new NRFAQCnf((HashMap) responseParam), null);
+                            }
                             NRCacheManager.storeAnswerById(mContext, NRUtilities.md5(params), (HashMap) responseParam);
                         }
                     }
