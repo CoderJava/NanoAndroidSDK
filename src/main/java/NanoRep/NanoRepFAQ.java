@@ -165,10 +165,12 @@ public class NanoRepFAQ {
                 public void response(Object responseParam, NRError error) {
                     if (error != null) {
                         HashMap<String, Object> cachedResponse = NRCacheManager.getAnswerById(mContext, NRUtilities.md5(params));
-                        if (cachedResponse != null) {
-                            completion.fetchDefaultFAQ(new NRFAQCnf(cachedResponse), null);
-                        } else {
-                            completion.fetchDefaultFAQ(null, error);
+                        if (completion != null) {
+                            if (cachedResponse != null) {
+                                completion.fetchDefaultFAQ(new NRFAQCnf(cachedResponse), null);
+                            } else {
+                                completion.fetchDefaultFAQ(null, error);
+                            }
                         }
                     } else {
                         final NRFAQCnf cnf = new NRFAQCnf((HashMap) responseParam);

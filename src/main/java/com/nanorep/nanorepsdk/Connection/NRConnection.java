@@ -3,6 +3,8 @@ package com.nanorep.nanorepsdk.Connection;
 
 
 
+import android.os.AsyncTask;
+import android.os.Build;
 import android.util.Log;
 
 import java.net.URL;
@@ -39,7 +41,12 @@ public class NRConnection {
                 }
             }
         });
-        downloader.execute(url);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            downloader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, url);
+        } else {
+            downloader.execute(url);
+        }
+
     }
 
     public static void cancelAllConnections() {
