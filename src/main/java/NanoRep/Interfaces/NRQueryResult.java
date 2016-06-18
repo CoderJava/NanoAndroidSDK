@@ -11,6 +11,7 @@ public interface NRQueryResult {
     String getId();
     String getTitle();
     void setBody(String body);
+    String getLikes();
     String getBody();
     ArrayList<NRChanneling> getChanneling();
 }

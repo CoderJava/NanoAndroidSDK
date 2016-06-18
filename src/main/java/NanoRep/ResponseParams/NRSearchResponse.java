@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import NanoRep.Chnneling.NRChanneling;
+import NanoRep.Interfaces.NRQueryResult;
 import NanoRep.NanoRep;
 
 /**
@@ -14,7 +15,7 @@ public class NRSearchResponse {
     private String mSearchId;
     private String mLangCode;
     private String mDetectedLanguage;
-    private ArrayList<NRAnswer> mAnswerList;
+    private ArrayList<NRQueryResult> mAnswerList;
 
     /**
      * Converts JSON string into NRSearchResponse
@@ -56,7 +57,7 @@ public class NRSearchResponse {
      *
      * @return value of answer list
      */
-    public ArrayList<NRAnswer> getAnswerList() {
+    public ArrayList<NRQueryResult> getAnswerList() {
         if (mAnswerList == null) {
             ArrayList<HashMap<String, Object>> answers = (ArrayList)mParams.get("answers");
             if (answers != null && answers.size() > 0) {

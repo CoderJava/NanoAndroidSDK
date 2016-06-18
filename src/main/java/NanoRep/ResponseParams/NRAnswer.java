@@ -59,8 +59,8 @@ public class NRAnswer implements NRQueryResult{
      *
      * @return Value of like param
      */
-    public int getLikes() {
-        return mLikes;
+    public String getLikes() {
+        return Integer.toString(mLikes);
     }
 
     @Override

@@ -4,11 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 
+import NanoRep.Interfaces.NRQueryResult;
+
 /**
  * Created by nissopa on 9/13/15.
  */
 public class NRFAQGroupItem {
-    private ArrayList<NRFAQAnswerItem> mData;
+    private ArrayList<NRQueryResult> mData;
     private HashMap<String, Object> mParams;
 
     /**
@@ -51,7 +53,7 @@ public class NRFAQGroupItem {
      *
      * @return ArrayList of NRFAQAnswerItem
      */
-    public ArrayList<NRFAQAnswerItem> getAnswers() {
+    public ArrayList<NRQueryResult> getAnswers() {
         if (getFirstGroup() == null) {
             return null;
         }
@@ -62,8 +64,7 @@ public class NRFAQGroupItem {
             for (HashMap<String, Object> map: data) {
                 arr.add(new NRFAQAnswerItem(map));
             }
-            mData = new ArrayList<NRFAQAnswerItem>(arr);
-            arr = null;
+            mData = new ArrayList<NRQueryResult>(arr);
         }
         return mData;
     }

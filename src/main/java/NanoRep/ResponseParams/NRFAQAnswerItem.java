@@ -50,7 +50,7 @@ public class NRFAQAnswerItem implements NRQueryResult {
      * @return
      */
     public String getLikes() {
-        return ((Integer)mParams.get("likes")).toString();
+        return mParams.get("likes").toString();
     }
 
     /**
