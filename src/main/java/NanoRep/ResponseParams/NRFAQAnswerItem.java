@@ -90,6 +90,11 @@ public class NRFAQAnswerItem implements NRQueryResult {
     }
 
     @Override
+    public boolean isCNF() {
+        return true;
+    }
+
+    @Override
     public ArrayList<NRChanneling> getChanneling() {
         return null;
     }

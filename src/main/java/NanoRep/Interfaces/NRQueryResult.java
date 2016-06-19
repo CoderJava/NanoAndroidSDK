@@ -13,5 +13,6 @@ public interface NRQueryResult {
     void setBody(String body);
     String getLikes();
     String getBody();
+    boolean isCNF();
     ArrayList<NRChanneling> getChanneling();
 }

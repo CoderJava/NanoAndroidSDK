@@ -3,6 +3,8 @@ package NanoRep.RequestParams;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import NanoRep.Interfaces.NRQueryResult;
+
 /**
  * Created by nissopa on 9/13/15.
  */
@@ -12,6 +14,11 @@ public class NRSearchLikeParams extends NRRequestParams {
     private String mKeywordSetId;
     private String mKBLanguageCode;
     private String mArticleId;
+
+    public NRSearchLikeParams(NRQueryResult result) {
+        super(result);
+        setArticleId(result.getId());
+    }
 
     /**
      * Send like for search result

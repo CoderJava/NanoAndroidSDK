@@ -87,6 +87,11 @@ public class NRAnswer implements NRQueryResult{
         return getSummary();
     }
 
+    @Override
+    public boolean isCNF() {
+        return false;
+    }
+
     /**
      * Fetches short description of the answer
      *

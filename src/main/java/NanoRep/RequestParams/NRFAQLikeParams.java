@@ -1,5 +1,7 @@
 package NanoRep.RequestParams;
 
+import NanoRep.Interfaces.NRQueryResult;
+
 /**
  * Created by nissopa on 9/13/15.
  */
@@ -7,6 +9,12 @@ public class NRFAQLikeParams extends NRRequestParams {
     private NRLikeType mLikeType;
     private String mKeyboardName;
     private String mAnswerId;
+
+    public NRFAQLikeParams(NRQueryResult result) {
+        super(result);
+        setAnswerId(result.getId());
+    }
+
 
     /**
      *  Set the feedback type

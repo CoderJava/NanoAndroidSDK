@@ -1,5 +1,7 @@
 package NanoRep.RequestParams;
 
+import NanoRep.Interfaces.NRQueryResult;
+
 /**
  * Created by nissopa on 9/13/15.
  */
@@ -7,6 +9,10 @@ public class NRFAQParams extends NRRequestParams {
     private int mDays;
     private int mItems;
     private int mKnowledgeBase;
+
+    public NRFAQParams(NRQueryResult result) {
+        super(result);
+    }
 
     /**
      * How many days worth of statistics to return.

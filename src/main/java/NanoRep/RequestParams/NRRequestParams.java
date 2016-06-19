@@ -2,6 +2,7 @@ package NanoRep.RequestParams;
 
 import java.util.HashMap;
 
+import NanoRep.Interfaces.NRQueryResult;
 import NanoRep.NanoRep;
 
 /**
@@ -9,6 +10,11 @@ import NanoRep.NanoRep;
  */
 public class NRRequestParams {
     private HashMap<String, String> mParams;
+    protected NRQueryResult mResult;
+
+    public NRRequestParams(NRQueryResult result) {
+        mResult = result;
+    }
 
     public HashMap<String, String> getParams() {
         if (mParams == null) {
