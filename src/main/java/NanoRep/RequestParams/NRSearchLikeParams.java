@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import NanoRep.Interfaces.NRQueryResult;
+import NanoRep.ResponseParams.NRAnswer;
 
 /**
  * Created by nissopa on 9/13/15.
@@ -18,6 +19,8 @@ public class NRSearchLikeParams extends NRRequestParams {
     public NRSearchLikeParams(NRQueryResult result) {
         super(result);
         setArticleId(result.getId());
+        setKeywordSetId(((NRAnswer)result).getKeywordsetId());
+        setSearchQuery(result.getTitle());
     }
 
     /**

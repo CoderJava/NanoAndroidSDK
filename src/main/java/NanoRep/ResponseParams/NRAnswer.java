@@ -114,8 +114,8 @@ public class NRAnswer implements NRQueryResult{
             ArrayList<HashMap<String, ?>> channels = (ArrayList)mParams.get("rechanneling");
             if (channels != null && channels.size() > 0) {
                 mChanneling = new ArrayList<>();
-                for (HashMap<String, ?> channel : channels) {
-                    mChanneling.add(new NRChanneling(channel));
+                for (HashMap channel : channels) {
+                    mChanneling.add(NRChanneling.channelForParams(channel));
                 }
             } else {
                 return null;

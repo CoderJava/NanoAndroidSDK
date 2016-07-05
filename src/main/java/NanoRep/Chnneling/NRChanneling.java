@@ -2,6 +2,8 @@ package NanoRep.Chnneling;
 
 import java.util.HashMap;
 
+import NanoRep.Interfaces.NRQueryResult;
+
 /**
  * Created by nissimpardo on 29/12/15.
  */
@@ -9,6 +11,7 @@ public class NRChanneling {
     protected String buttonText;
     protected String channelDescription;
     protected NRChannelingType type;
+    protected NRQueryResult mQueryResult;
 
     public enum NRChannelingType {
         PhoneNumber,
@@ -35,6 +38,13 @@ public class NRChanneling {
         return type;
     }
 
+    public void setQueryResult(NRQueryResult queryResult) {
+        mQueryResult = queryResult;
+    }
+
+    public NRQueryResult getQueryResult() {
+        return mQueryResult;
+    }
 
     public static NRChanneling channelForParams(HashMap <String, Object> params) {
         int actionEsc = Integer.parseInt((String)params.get("actionEsc"));

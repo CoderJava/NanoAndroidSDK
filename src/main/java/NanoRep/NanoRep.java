@@ -118,6 +118,14 @@ public class NanoRep {
         mKnowledgeBase = knowledgeBase;
     }
 
+    public String getAccountName() {
+        return mAccountName;
+    }
+
+    public String getKnowledgeBase() {
+        return mKnowledgeBase;
+    }
+
     /**
      *
      * @param referer User custom referrer
@@ -305,9 +313,9 @@ public class NanoRep {
             mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(sContext);
         }
         mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, sContext.getPackageName());
-        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 2000000);
+        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, "en-US");
+        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, "nanorep.nanowidget");
+        mSpeechRecognizerIntent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 2000);
 
         mSpeechRecognizer.setRecognitionListener(new RecognitionListener() {
             @Override
@@ -337,7 +345,7 @@ public class NanoRep {
 
             @Override
             public void onError(int error) {
-                Log.d("startVoiceRecognition", "onError");
+                Log.d("startVoiceRecognition", "onError " + error);
                 completion.speechReconitionResults("");
             }
 
