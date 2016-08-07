@@ -1,4 +1,5 @@
 package com.nanorep.nanorepsdk.Connection;
+import android.net.Uri;
 import android.os.AsyncTask;
 
 import java.io.BufferedInputStream;
@@ -15,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * Created by nissopa on 9/12/15.
  */
-public class NRDownloader extends  AsyncTask <URL, Integer, Object> {
+public class NRDownloader extends  AsyncTask <Uri, Integer, Object> {
     private NRDownloaderListener mListener;
     public interface NRDownloaderListener {
         void downloadCompleted(NRDownloader downloader, Object data, NRError error);
@@ -28,10 +29,15 @@ public class NRDownloader extends  AsyncTask <URL, Integer, Object> {
     }
 
     @Override
-    protected Object doInBackground(URL... urls) {
-        URL url = urls[0];
+    protected Object doInBackground(Uri... uris) {
+        Uri uri = uris[0];
+        URL url = null;
         byte[] data = null;
         try{
+            url = new URL(uri.toString());
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("Referer", uri.getQueryParameter("referer"));
+            connection.connect();
             InputStream inputStream = new BufferedInputStream(url.openStream());
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             int next = inputStream.read();

@@ -1,12 +1,10 @@
-package NanoRep.ResponseParams;
+package nanorep.ResponseParams;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.SimpleTimeZone;
 
-import NanoRep.Chnneling.NRChanneling;
-import NanoRep.Interfaces.NRQueryResult;
-import NanoRep.NanoRep;
+import nanorep.Chnneling.NRChanneling;
+import nanorep.Interfaces.NRQueryResult;
 
 /**
  * Created by nissopa on 9/12/15.

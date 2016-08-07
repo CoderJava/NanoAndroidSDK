@@ -1,4 +1,4 @@
-package NanoRep.Interfaces;
+package nanorep.Interfaces;
 
 /**
  * Created by nissopa on 9/14/15.

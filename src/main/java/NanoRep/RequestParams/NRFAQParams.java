@@ -1,6 +1,6 @@
-package NanoRep.RequestParams;
+package nanorep.RequestParams;
 
-import NanoRep.Interfaces.NRQueryResult;
+import nanorep.Interfaces.NRQueryResult;
 
 /**
  * Created by nissopa on 9/13/15.

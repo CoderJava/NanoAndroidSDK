@@ -1,4 +1,4 @@
-package NanoRep.ResponseParams;
+package nanorep.ResponseParams;
 
 import java.util.ArrayList;
 import java.util.HashMap;

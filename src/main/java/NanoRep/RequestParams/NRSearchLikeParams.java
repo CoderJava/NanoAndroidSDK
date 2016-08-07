@@ -1,10 +1,10 @@
-package NanoRep.RequestParams;
+package nanorep.RequestParams;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-import NanoRep.Interfaces.NRQueryResult;
-import NanoRep.ResponseParams.NRAnswer;
+import nanorep.Interfaces.NRQueryResult;
+import nanorep.ResponseParams.NRAnswer;
 
 /**
  * Created by nissopa on 9/13/15.

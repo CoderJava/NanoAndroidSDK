@@ -1,4 +1,4 @@
-package NanoRep.RequestParams;
+package nanorep.RequestParams;
 
 /**
  * Created by nissimpardo on 18/11/15.

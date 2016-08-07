@@ -1,8 +1,8 @@
-package NanoRep.Interfaces;
+package nanorep.Interfaces;
 
 import com.nanorep.nanorepsdk.Connection.NRError;
 
-import NanoRep.ResponseParams.NRFAQDataObject;
+import nanorep.ResponseParams.NRFAQDataObject;
 
 /**
  * Created by nissopa on 9/14/15.

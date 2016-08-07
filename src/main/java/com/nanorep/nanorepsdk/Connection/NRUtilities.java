@@ -1,5 +1,6 @@
 package com.nanorep.nanorepsdk.Connection;
 
+import android.net.Uri;
 import android.util.Base64;
 
 import com.nanorep.nanorepsdk.BuildConfig;
@@ -9,7 +10,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -58,6 +61,10 @@ public class NRUtilities {
 
     public static String wrappedContextBase64(HashMap<String, String > context) {
         return Base64.encodeToString(wrappedContext(context).getBytes(), Base64.DEFAULT) ;
+    }
+
+    public static String autorityForAccount(String account) {
+        return account + ".nanorep.com";
     }
 
     public static Object jsonStringToPropertyList(String jsonString){
@@ -169,18 +176,23 @@ public class NRUtilities {
         return url;
     }
 
-    public static final String md5(HashMap<String, String> params) {
-        final String MD5 = "MD5";
-        String api = params.get("api");
-        String link = "https://" + params.get(DomainKey) + "/~" + params.get(AccountNameKey);
-        if (api != null) {
-            link += (api.equals("cnf") ? "/widget/scripts/" + api + ".json" : "/api/faq/v1/" + api + ".js") + "?";
-            params.remove("api");
-            for (String key: params.keySet()) {
-                link += key + "=" + params.get(key) + "&";
-            }
-            link = link.substring(0, link.length() - 1);
+    public static URL configurationURL(Uri.Builder uriBuilder) {
+        Uri uri = uriBuilder.build();
+        URL url = null;
+        try {
+            url = new URL(uri.toString());
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestProperty("Referer", uri.getQueryParameter("referer"));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+        return url;
+    }
+
+    public static final String md5(String link) {
+        final String MD5 = "MD5";
         try {
             // Create MD5 Hash
             java.security.MessageDigest digest = java.security.MessageDigest

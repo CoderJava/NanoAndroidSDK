@@ -1,10 +1,9 @@
-package NanoRep.ResponseParams;
+package nanorep.ResponseParams;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 
-import NanoRep.Interfaces.NRQueryResult;
+import nanorep.Interfaces.NRQueryResult;
 
 /**
  * Created by nissopa on 9/13/15.

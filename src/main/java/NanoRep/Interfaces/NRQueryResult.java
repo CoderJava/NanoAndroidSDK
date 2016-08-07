@@ -1,8 +1,8 @@
-package NanoRep.Interfaces;
+package nanorep.Interfaces;
 
 import java.util.ArrayList;
 
-import NanoRep.Chnneling.NRChanneling;
+import nanorep.Chnneling.NRChanneling;
 
 /**
  * Created by nissimpardo on 07/06/16.

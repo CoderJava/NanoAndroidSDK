@@ -1,23 +1,22 @@
-package NanoRep.ResponseParams;
+package nanorep.ResponseParams;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
 
 /**
  * Created by nissopa on 9/13/15.
  */
-public class NRFAQCnf {
+public class NRConfiguration {
     private NRFAQData mFaqData;
     private HashMap<String, Object> mParams;
     private boolean mIsContextDependent = false;
 
     /**
-     * Converts the response JSON into NRFAQCnf object
+     * Converts the response JSON into NRConfiguration object
      *
      * @param HashMap contains all of the params from the JSON
      */
-    public NRFAQCnf(HashMap<String, Object> params) {
+    public NRConfiguration(HashMap<String, Object> params) {
         mParams = params;
         if (params != null) {
             Object faq = mParams.get("faqData");

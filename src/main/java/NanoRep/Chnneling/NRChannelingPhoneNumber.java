@@ -1,4 +1,4 @@
-package NanoRep.Chnneling;
+package nanorep.Chnneling;
 
 import java.util.HashMap;
 

@@ -1,9 +1,7 @@
-package NanoRep.ResponseParams;
+package nanorep.ResponseParams;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import NanoRep.NanoRep;
 
 /**
  * Created by nissopa on 9/12/15.

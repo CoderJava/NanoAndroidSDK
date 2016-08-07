@@ -3,13 +3,14 @@ package com.nanorep.nanorepsdk.Connection;
 
 
 
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
 
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by nissopa on 9/12/15.
@@ -18,12 +19,12 @@ public class NRConnection {
     public static String NRStatusKey = "status";
 
     static private ArrayList<NRDownloader> mConnections;
-    public interface NRConnectionListener {
+
+    public interface Listener {
         void response(Object responseParam, NRError error);
     }
 
-    public static void connectionWithRequest(URL url, final NRConnectionListener listener) {
-        Log.d("RequestURL", url.toString());
+    public static void connectionWithRequest(Uri uri, final Listener listener) {
         NRDownloader downloader = new NRDownloader(new NRDownloader.NRDownloaderListener() {
             @Override
             public void downloadCompleted(NRDownloader downloader, Object data, NRError error) {
@@ -42,9 +43,9 @@ public class NRConnection {
             }
         });
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            downloader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, url);
+            downloader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, uri);
         } else {
-            downloader.execute(url);
+            downloader.execute(uri);
         }
 
     }

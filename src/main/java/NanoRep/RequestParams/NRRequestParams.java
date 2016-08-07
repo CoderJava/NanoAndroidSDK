@@ -1,9 +1,8 @@
-package NanoRep.RequestParams;
+package nanorep.RequestParams;
 
 import java.util.HashMap;
 
-import NanoRep.Interfaces.NRQueryResult;
-import NanoRep.NanoRep;
+import nanorep.Interfaces.NRQueryResult;
 
 /**
  * Created by nissopa on 9/13/15.

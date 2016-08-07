@@ -1,8 +1,8 @@
-package NanoRep.Chnneling;
+package nanorep.Chnneling;
 
 import java.util.HashMap;
 
-import NanoRep.Interfaces.NRQueryResult;
+import nanorep.Interfaces.NRQueryResult;
 
 /**
  * Created by nissimpardo on 29/12/15.
