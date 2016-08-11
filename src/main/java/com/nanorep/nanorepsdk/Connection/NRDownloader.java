@@ -1,6 +1,7 @@
 package com.nanorep.nanorepsdk.Connection;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -18,6 +19,8 @@ import java.nio.charset.StandardCharsets;
  */
 public class NRDownloader extends  AsyncTask <Uri, Integer, Object> {
     private NRDownloaderListener mListener;
+    private int mStatus;
+
     public interface NRDownloaderListener {
         void downloadCompleted(NRDownloader downloader, Object data, NRError error);
     }
@@ -26,6 +29,10 @@ public class NRDownloader extends  AsyncTask <Uri, Integer, Object> {
     public NRDownloader(NRDownloaderListener listener) {
         super();
         mListener = listener;
+    }
+
+    public int getResponseStatus() {
+        return mStatus;
     }
 
     @Override
@@ -49,6 +56,7 @@ public class NRDownloader extends  AsyncTask <Uri, Integer, Object> {
             data = bos.toByteArray();
             bos.flush();
             bos.close();
+            mStatus = connection.getResponseCode();
         }catch (Exception e){
 
             e.printStackTrace();

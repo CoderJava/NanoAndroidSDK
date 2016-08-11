@@ -21,7 +21,7 @@ public class NRConnection {
     static private ArrayList<NRDownloader> mConnections;
 
     public interface Listener {
-        void response(Object responseParam, NRError error);
+        void response(Object responseParam, int status , NRError error);
     }
 
     public static void connectionWithRequest(Uri uri, final Listener listener) {
@@ -30,11 +30,11 @@ public class NRConnection {
             public void downloadCompleted(NRDownloader downloader, Object data, NRError error) {
                 if (listener != null) {
                     if (error != null) {
-                        listener.response(null, error);
+                        listener.response(null, -1, error);
                     } else if (data != null) {
                         String jsonString = new String((byte[])data);
                         Object retMap = NRUtilities.jsonStringToPropertyList(jsonString);
-                        listener.response(retMap, null);
+                        listener.response(retMap, downloader.getResponseStatus(), null);
                     }
                 }
                 if (NRConnection.mConnections != null && NRConnection.mConnections.contains(downloader)) {

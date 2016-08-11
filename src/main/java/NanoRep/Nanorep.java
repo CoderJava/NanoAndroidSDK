@@ -39,6 +39,8 @@ public interface Nanorep {
         void onConfigurationFetched(NRConfiguration configuration, NRError error);
     }
 
+    AccountParams getAccountParams();
+
     void searchText(String text, OnSearchResultsFetchedListener onSearchResultsFetchedListener);
 
     void suggestionsForText(String text, OnSuggestionsFetchedListener onSuggestionsFetchedListener);
